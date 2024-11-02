@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/object_provider.dart';
 
 final playerProvider =
     StateNotifierProvider<PlayerNotifier, PlayerState>((ref) {
@@ -57,7 +58,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     );
   }
 
-  void attack(){
+  void attack() {
     state = state.copyWith(
       currentState: PlayerStates.attack,
     );
@@ -84,8 +85,8 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentDirection: Directions.right,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
+      ref.read(objectProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
-
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
   }
 
@@ -114,6 +115,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentDirection: Directions.left,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
+      ref.read(objectProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
 
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
@@ -175,4 +177,3 @@ class PlayerState {
     );
   }
 }
-

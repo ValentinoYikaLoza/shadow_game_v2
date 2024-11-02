@@ -45,8 +45,8 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
           ),
           //Puerta
           Positioned(
-            bottom: doorState.positionY,
-            left: doorState.positionX,
+            bottom: 60,
+            left: doorState.initialPosition,
             child: SizedBox(
               width: 100,
               child: Image.asset(
