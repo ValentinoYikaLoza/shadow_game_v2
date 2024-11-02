@@ -27,6 +27,11 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/level_one/
+    - assets/images/shared/
+    - assets/images/shared/damage/
+    - assets/images/shared/endurance/
+    - assets/images/shared/speed/
+    - assets/images/shared/life/
     - assets/gifs/player/
     - assets/gifs/shadow/
     - assets/gifs/
