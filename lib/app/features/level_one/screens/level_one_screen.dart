@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/parallax_background.dart';

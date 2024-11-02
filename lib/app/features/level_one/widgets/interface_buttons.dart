@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
-import 'package:shadow_game_v2/app/config/router/app_router.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/custom_button.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/skills_dialog.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/skills_dialog.dart';
 
 class InterfaceButtons extends ConsumerWidget {
   final Widget child;
@@ -41,15 +40,7 @@ class InterfaceButtons extends ConsumerWidget {
             imagePath: 'assets/images/shared/skillButton.png',
             scale: 2,
             onPressed: () {
-              if (rootNavigatorKey.currentContext == null) return;
-              showDialog(
-                context: rootNavigatorKey.currentContext!,
-                barrierColor: AppColors.black.withOpacity(0.5),
-                barrierDismissible: true,
-                builder: (context) {
-                  return const SkillsDialog();
-                },
-              );
+              SkillDialog.show();
             },
           ),
         ),
