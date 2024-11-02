@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/object_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
@@ -17,8 +18,8 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context);
     final playerState = ref.watch(playerProvider);
-    final dogState = ref.watch(dogProvider);
     final doorState = ref.watch(objectProvider);
+    final dogState = ref.watch(dogProvider);
     return Scaffold(
       body: Stack(
         children: [
@@ -61,7 +62,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.rotationY(
-                dogState.currentDirection == ShadowDirections.left
+                dogState.currentDirection == Directions.left
                     ? 3.14159
                     : 0,
               ),
@@ -80,7 +81,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.rotationY(
-                playerState.currentDirection == PlayerDirections.left
+                playerState.currentDirection == Directions.left
                     ? 3.14159
                     : 0,
               ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 
 final playerProvider =
@@ -72,7 +73,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       // Si no ha llegado al límite derecho, movemos al jugador
       state = state.copyWith(
         positionX: state.positionX + distanciaRecorrida,
-        currentDirection: PlayerDirections.right,
+        currentDirection: Directions.right,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
     } else {
@@ -80,7 +81,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       state = state.copyWith(
         skyPosition: state.skyPosition - distanciaRecorrida,
         groundPosition: state.groundPosition - distanciaRecorrida,
-        currentDirection: PlayerDirections.right,
+        currentDirection: Directions.right,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
     }
@@ -102,7 +103,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       // Si no ha llegado al límite izquierdo, movemos al jugador
       state = state.copyWith(
         positionX: state.positionX + distanciaRecorrida,
-        currentDirection: PlayerDirections.left,
+        currentDirection: Directions.left,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
     } else {
@@ -110,7 +111,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       state = state.copyWith(
         skyPosition: state.skyPosition - distanciaRecorrida,
         groundPosition: state.groundPosition - distanciaRecorrida,
-        currentDirection: PlayerDirections.left,
+        currentDirection: Directions.left,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
     }
@@ -133,7 +134,7 @@ class PlayerState {
   final double positionX;
   final double positionY;
   final bool isJumping;
-  final PlayerDirections currentDirection;
+  final Directions currentDirection;
   final PlayerStates currentState;
   final double moveAmount;
   final double playerSpeed;
@@ -144,7 +145,7 @@ class PlayerState {
     this.positionX = 20,
     this.positionY = 85,
     this.isJumping = false,
-    this.currentDirection = PlayerDirections.right,
+    this.currentDirection = Directions.right,
     this.currentState = PlayerStates.stay,
     this.moveAmount = 10,
     this.playerSpeed = 0.2,
@@ -156,7 +157,7 @@ class PlayerState {
     double? positionX,
     double? positionY,
     bool? isJumping,
-    PlayerDirections? currentDirection,
+    Directions? currentDirection,
     PlayerStates? currentState,
     double? moveAmount,
     double? playerSpeed,
@@ -175,19 +176,3 @@ class PlayerState {
   }
 }
 
-enum PlayerStates {
-  stay('assets/gifs/player/stay.gif'),
-  walk('assets/gifs/player/walk.gif'),
-  attack('assets/gifs/player/attack.gif'),
-  cut('assets/gifs/player/cut.gif'),
-  jump('assets/gifs/player/jump.gif');
-
-  final String gif;
-  const PlayerStates(this.gif);
-}
-
-enum PlayerDirections {
-  right,
-  left,
-  up;
-}

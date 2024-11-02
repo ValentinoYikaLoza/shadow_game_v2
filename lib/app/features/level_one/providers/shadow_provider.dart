@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
 final dogProvider = StateNotifierProvider<DogNotifier, DogState>((ref) {
@@ -38,22 +39,22 @@ class DogNotifier extends StateNotifier<DogState> {
       state = state.copyWith(
         positionX: playerState.positionX + followDistance,
         currentState: ShadowStates.walk,
-        currentDirection: ShadowDirections.left,
+        currentDirection: Directions.left,
       );
     } else if (playerState.positionX > state.positionX + followDistance) {
       // Si el jugador está a la derecha y el perro está demasiado lejos
       state = state.copyWith(
         positionX: playerState.positionX - followDistance,
         currentState: ShadowStates.walk,
-        currentDirection: ShadowDirections.right,
+        currentDirection: Directions.right,
       );
     } else {
       // Solo se sienta si no estaba caminando previamente
       state = state.copyWith(
         currentState: ShadowStates.sit,
         currentDirection: playerState.positionX < state.positionX
-            ? ShadowDirections.left
-            : ShadowDirections.right,
+            ? Directions.left
+            : Directions.right,
       );
     }
   }
@@ -63,20 +64,20 @@ class DogState {
   final double positionX;
   final double positionY;
   final ShadowStates currentState;
-  final ShadowDirections currentDirection;
+  final Directions currentDirection;
 
   DogState({
     this.positionX = 45,
     this.positionY = 82,
     this.currentState = ShadowStates.sit,
-    this.currentDirection = ShadowDirections.left,
+    this.currentDirection = Directions.left,
   });
 
   DogState copyWith({
     double? positionX,
     double? positionY,
     ShadowStates? currentState,
-    ShadowDirections? currentDirection,
+    Directions? currentDirection,
   }) {
     return DogState(
       positionX: positionX ?? this.positionX,
@@ -85,17 +86,4 @@ class DogState {
       currentDirection: currentDirection ?? this.currentDirection,
     );
   }
-}
-
-enum ShadowStates {
-  sit('assets/gifs/shadow/sit.gif'),
-  walk('assets/gifs/shadow/walk.gif');
-
-  final String gif;
-  const ShadowStates(this.gif);
-}
-
-enum ShadowDirections {
-  right,
-  left,
 }
