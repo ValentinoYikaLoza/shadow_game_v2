@@ -144,7 +144,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
                           .updateXCoords(playerState.playerSpeed);
                     });
                   },
-                  onDoubleTapDown: (_) {
+                  onDoubleTapDown: (_) { 
                     setState(() {
                       ref.read(playerProvider.notifier).attack();
                     });
