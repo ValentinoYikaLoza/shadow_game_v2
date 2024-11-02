@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/object_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/parallax_background.dart';
@@ -17,6 +18,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
     final screen = MediaQuery.of(context);
     final playerState = ref.watch(playerProvider);
     final dogState = ref.watch(dogProvider);
+    final doorState = ref.watch(objectProvider);
     return Scaffold(
       body: Stack(
         children: [
@@ -38,6 +40,18 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
               imagePath: 'assets/images/level_one/ground.png',
               position: playerState.groundPosition,
               speed: playerState.playerSpeed,
+            ),
+          ),
+          //Puerta
+          Positioned(
+            bottom: doorState.positionY,
+            left: doorState.positionX,
+            child: SizedBox(
+              width: 100,
+              child: Image.asset(
+                'assets/images/level_one/door/close_door.png',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           // Perro

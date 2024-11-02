@@ -27,6 +27,8 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/level_one/
+    - assets/images/level_one/door/
+    - assets/images/level_one/chest/
     - assets/images/shared/
     - assets/images/shared/damage/
     - assets/images/shared/endurance/

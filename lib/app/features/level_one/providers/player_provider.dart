@@ -10,7 +10,7 @@ final playerProvider =
 
 class PlayerNotifier extends StateNotifier<PlayerState> {
   PlayerNotifier(this.ref) : super(PlayerState());
-  final StateNotifierProviderRef ref;
+  final Ref ref;
   Timer? _jumpTimer;
   Timer? _fallTimer;
 

@@ -7,7 +7,7 @@ final backgroundProvider =
 
 class BackgroundNotifier extends StateNotifier<BackgroundState> {
   BackgroundNotifier(this.ref) : super(BackgroundState());
-  final StateNotifierProviderRef ref;
+  final Ref ref;
 
   void updateXCoords(double distanciaRecorrida) {
     final newPosition = state.initialPosition + distanciaRecorrida;

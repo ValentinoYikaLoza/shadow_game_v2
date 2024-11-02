@@ -6,7 +6,7 @@ final skillProvider = StateNotifierProvider<SkillNotifier, SkillState>((ref) {
 
 class SkillNotifier extends StateNotifier<SkillState> {
   SkillNotifier(this.ref) : super(SkillState());
-  final StateNotifierProviderRef ref;
+  final Ref ref;
 
   void levelUPDamage() {
     if (state.currentLevelDamage >= 3) return;

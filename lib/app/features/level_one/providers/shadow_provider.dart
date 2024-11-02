@@ -12,7 +12,7 @@ class DogNotifier extends StateNotifier<DogState> {
       followPlayer(previous, next);
     });
   }
-  final StateNotifierProviderRef ref;
+  final Ref ref;
   double? previousPositionX;
 
   void followPlayer(PlayerState? previousState, PlayerState playerState) {
