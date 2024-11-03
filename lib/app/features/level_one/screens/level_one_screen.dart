@@ -79,13 +79,19 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
           ),
           // Enemigo araña
           Positioned(
-            bottom: 85,
+            bottom: 80,
             left: spiderState.initialPosition,
             child: SizedBox(
               width: 100,
-              child: Image.asset(
-                spiderState.currentState.gif,
-                fit: BoxFit.cover,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationY(
+                  spiderState.currentDirection != Directions.left ? 3.14159 : 0,
+                ),
+                child: Image.asset(
+                  spiderState.currentState.gif,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
 final spiderProvider =
     StateNotifierProvider<SpiderNotifier, SpiderState>((ref) {
@@ -8,7 +9,12 @@ final spiderProvider =
 });
 
 class SpiderNotifier extends StateNotifier<SpiderState> {
-  SpiderNotifier(this.ref) : super(SpiderState());
+  SpiderNotifier(this.ref) : super(SpiderState()) {
+    // Escuchar los cambios del jugador para actualizar la posición y dirección del perro
+    ref.listen(playerProvider, (previous, next) {
+      followPlayer(previous, next);
+    });
+  }
   final Ref ref;
 
   void updateXCoords(double distanciaRecorrida) {
@@ -19,22 +25,41 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     // print(state.initialPosition);
   }
 
-  void attack(){
-    state = state.copyWith(
-      currentState: SpiderStates.attack
-    );
+  void followPlayer(PlayerState? previousState, PlayerState playerState) {
+    // Definimos la distancia a mantener detrás del jugador
+    const double followDistance = 80.0;
+
+    // Actualizar la posición y dirección de la araña para que siga al jugador
+    if (playerState.positionX < state.initialPosition - followDistance) {
+      // Si el jugador está a la izquierda y la araña está demasiado lejos
+      state = state.copyWith(
+        currentDirection: Directions.left,
+      );
+    } else if (playerState.positionX > state.initialPosition + followDistance) {
+      // Si el jugador está a la derecha y la araña está demasiado lejos
+      state = state.copyWith(
+        currentDirection: Directions.right,
+      );
+    } else {
+      // ataca si la araña está cerca del jugador
+      state = state.copyWith(
+        currentDirection: playerState.positionX < state.initialPosition
+            ? Directions.left
+            : Directions.right,
+      );
+    }
   }
 
-  void die(){
-    state = state.copyWith(
-      currentState: SpiderStates.die
-    );
+  void attack() {
+    state = state.copyWith(currentState: SpiderStates.attack);
   }
 
-  void walk(){
-    state = state.copyWith(
-      currentState: SpiderStates.walk
-    );
+  void die() {
+    state = state.copyWith(currentState: SpiderStates.die);
+  }
+
+  void walk() {
+    state = state.copyWith(currentState: SpiderStates.walk);
   }
 
   bool isPlayerColliding(double playerX) {
@@ -59,22 +84,26 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 class SpiderState {
   final double initialPosition;
   final SpiderStates currentState;
+  final Directions currentDirection;
   final double width;
 
   SpiderState({
     this.initialPosition = 500,
     this.currentState = SpiderStates.stay,
+    this.currentDirection = Directions.left,
     this.width = 120,
   });
 
   SpiderState copyWith({
     double? initialPosition,
     SpiderStates? currentState,
+    Directions? currentDirection,
     double? width,
   }) {
     return SpiderState(
       initialPosition: initialPosition ?? this.initialPosition,
       currentState: currentState ?? this.currentState,
+      currentDirection: currentDirection ?? this.currentDirection,
       width: width ?? this.width,
     );
   }
