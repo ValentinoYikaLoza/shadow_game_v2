@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/object_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 
 final playerProvider =
     StateNotifierProvider<PlayerNotifier, PlayerState>((ref) {
@@ -85,9 +85,10 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentDirection: Directions.right,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
-      ref.read(objectProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
+    checkCollisions();
   }
 
   void moveLeft() {
@@ -115,10 +116,11 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentDirection: Directions.left,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
-      ref.read(objectProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
 
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
+    checkCollisions();
   }
 
   void stopMoving() {
@@ -126,6 +128,19 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       state = state.copyWith(
         currentState: PlayerStates.stay,
       );
+    }
+    checkCollisions();
+  }
+
+  void checkCollisions() {
+    final isColliding = ref
+        .read(doorProvider.notifier)
+        .isPlayerColliding(state.positionX, state.positionY);
+
+    if (isColliding) {
+      ref.read(doorProvider.notifier).openDoor();
+    } else {
+      ref.read(doorProvider.notifier).closeDoor();
     }
   }
 }

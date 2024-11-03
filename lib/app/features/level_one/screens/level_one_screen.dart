@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/object_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/parallax_background.dart';
@@ -18,7 +18,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context);
     final playerState = ref.watch(playerProvider);
-    final doorState = ref.watch(objectProvider);
+    final doorState = ref.watch(doorProvider);
     final dogState = ref.watch(dogProvider);
     return Scaffold(
       body: Stack(
@@ -47,12 +47,18 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
           Positioned(
             bottom: 60,
             left: doorState.initialPosition,
-            child: SizedBox(
-              width: 100,
-              child: Image.asset(
-                'assets/images/level_one/door/close_door.png',
-                fit: BoxFit.cover,
-              ),
+            child: Column(
+              children: [
+                Image.asset('assets/gifs/home.gif'),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 100,
+                  child: Image.asset(
+                    doorState.currentState.image,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
             ),
           ),
           // Perro
@@ -62,9 +68,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.rotationY(
-                dogState.currentDirection == Directions.left
-                    ? 3.14159
-                    : 0,
+                dogState.currentDirection == Directions.left ? 3.14159 : 0,
               ),
               child: Image.asset(
                 width: 80,
@@ -81,9 +85,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
             child: Transform(
               alignment: Alignment.center,
               transform: Matrix4.rotationY(
-                playerState.currentDirection == Directions.left
-                    ? 3.14159
-                    : 0,
+                playerState.currentDirection == Directions.left ? 3.14159 : 0,
               ),
               child: Image.asset(
                 playerState.currentState.gif,

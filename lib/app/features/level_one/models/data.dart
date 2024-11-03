@@ -17,6 +17,14 @@ enum ShadowStates {
   const ShadowStates(this.gif);
 }
 
+enum DoorStates {
+  open('assets/images/level_one/door/open_door.png'),
+  close('assets/images/level_one/door/close_door.png');
+
+  final String image;
+  const DoorStates(this.image);
+}
+
 enum Directions {
   right,
   left,
