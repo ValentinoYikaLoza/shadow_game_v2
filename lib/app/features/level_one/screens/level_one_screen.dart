@@ -61,6 +61,17 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
               ],
             ),
           ),
+          Positioned(
+            bottom: 60,
+            left: doorState.initialPosition,
+            child: SizedBox(
+              width: 100,
+              child: Image.asset(
+                doorState.currentState.image,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           // Perro
           Positioned(
             bottom: dogState.positionY,

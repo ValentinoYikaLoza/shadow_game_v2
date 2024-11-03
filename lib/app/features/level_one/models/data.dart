@@ -25,6 +25,14 @@ enum DoorStates {
   const DoorStates(this.image);
 }
 
+enum ChestStates {
+  open('assets/images/level_one/chest/open_door.png'),
+  close('assets/images/level_one/chest/close_door.png');
+
+  final String image;
+  const ChestStates(this.image);
+}
+
 enum Directions {
   right,
   left,

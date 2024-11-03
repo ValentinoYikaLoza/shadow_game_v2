@@ -2,12 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 
-final doorProvider = StateNotifierProvider<DoorNotifier, DoorState>((ref) {
-  return DoorNotifier(ref);
+final chestProvider = StateNotifierProvider<ChestNotifier, ChestState>((ref) {
+  return ChestNotifier(ref);
 });
 
-class DoorNotifier extends StateNotifier<DoorState> {
-  DoorNotifier(this.ref) : super(DoorState());
+class ChestNotifier extends StateNotifier<ChestState> {
+  ChestNotifier(this.ref) : super(ChestState());
   final Ref ref;
 
   void updateXCoords(double distanciaRecorrida) {
@@ -20,13 +20,13 @@ class DoorNotifier extends StateNotifier<DoorState> {
 
   void openDoor() {
     state = state.copyWith(
-      currentState: DoorStates.open,
+      currentState: ChestStates.open,
     );
   }
 
   void closeDoor() {
     state = state.copyWith(
-      currentState: DoorStates.close,
+      currentState: ChestStates.close,
     );
   }
 
@@ -49,23 +49,23 @@ class DoorNotifier extends StateNotifier<DoorState> {
   }
 }
 
-class DoorState {
+class ChestState {
   final double initialPosition;
-  final DoorStates currentState;
+  final ChestStates currentState;
   final double width;
 
-  DoorState({
-    this.initialPosition = 100,
-    this.currentState = DoorStates.close,
+  ChestState({
+    this.initialPosition = 500,
+    this.currentState = ChestStates.close,
     this.width = 80,
   });
 
-  DoorState copyWith({
+  ChestState copyWith({
     double? initialPosition,
-    DoorStates? currentState,
+    ChestStates? currentState,
     double? width,
   }) {
-    return DoorState(
+    return ChestState(
       initialPosition: initialPosition ?? this.initialPosition,
       currentState: currentState ?? this.currentState,
       width: width ?? this.width,
