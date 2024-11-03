@@ -5,6 +5,7 @@ import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.d
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/parallax_background.dart';
 
 class LevelOneScreen extends ConsumerStatefulWidget {
@@ -22,6 +23,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
     final doorState = ref.watch(doorProvider);
     final chestState = ref.watch(chestProvider);
     final dogState = ref.watch(dogProvider);
+    final spiderState = ref.watch(spiderProvider);
     return Scaffold(
       body: Stack(
         children: [
@@ -71,6 +73,18 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
               width: 60,
               child: Image.asset(
                 chestState.currentState.image,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          // Enemigo araña
+          Positioned(
+            bottom: 85,
+            left: spiderState.initialPosition,
+            child: SizedBox(
+              width: 100,
+              child: Image.asset(
+                spiderState.currentState.gif,
                 fit: BoxFit.cover,
               ),
             ),

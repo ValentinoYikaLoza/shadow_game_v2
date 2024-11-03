@@ -2,12 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 
-final chestProvider = StateNotifierProvider<ChestNotifier, ChestState>((ref) {
-  return ChestNotifier(ref);
+final spiderProvider =
+    StateNotifierProvider<SpiderNotifier, SpiderState>((ref) {
+  return SpiderNotifier(ref);
 });
 
-class ChestNotifier extends StateNotifier<ChestState> {
-  ChestNotifier(this.ref) : super(ChestState());
+class SpiderNotifier extends StateNotifier<SpiderState> {
+  SpiderNotifier(this.ref) : super(SpiderState());
   final Ref ref;
 
   void updateXCoords(double distanciaRecorrida) {
@@ -18,15 +19,21 @@ class ChestNotifier extends StateNotifier<ChestState> {
     // print(state.initialPosition);
   }
 
-  void openChest() {
+  void attack(){
     state = state.copyWith(
-      currentState: ChestStates.open,
+      currentState: SpiderStates.attack
     );
   }
 
-  void closeChest() {
+  void die(){
     state = state.copyWith(
-      currentState: ChestStates.close,
+      currentState: SpiderStates.die
+    );
+  }
+
+  void walk(){
+    state = state.copyWith(
+      currentState: SpiderStates.walk
     );
   }
 
@@ -49,23 +56,23 @@ class ChestNotifier extends StateNotifier<ChestState> {
   }
 }
 
-class ChestState {
+class SpiderState {
   final double initialPosition;
-  final ChestStates currentState;
+  final SpiderStates currentState;
   final double width;
 
-  ChestState({
-    this.initialPosition = 600,
-    this.currentState = ChestStates.close,
-    this.width = 60,
+  SpiderState({
+    this.initialPosition = 500,
+    this.currentState = SpiderStates.stay,
+    this.width = 120,
   });
 
-  ChestState copyWith({
+  SpiderState copyWith({
     double? initialPosition,
-    ChestStates? currentState,
+    SpiderStates? currentState,
     double? width,
   }) {
-    return ChestState(
+    return SpiderState(
       initialPosition: initialPosition ?? this.initialPosition,
       currentState: currentState ?? this.currentState,
       width: width ?? this.width,

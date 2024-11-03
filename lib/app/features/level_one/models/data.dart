@@ -33,6 +33,16 @@ enum ChestStates {
   const ChestStates(this.image);
 }
 
+enum SpiderStates {
+  stay('assets/gifs/spider/stay.gif'),
+  walk('assets/gifs/spider/walk.gif'),
+  attack('assets/gifs/spider/attack.gif'),
+  die('assets/gifs/spider/die.gif');
+
+  final String gif;
+  const SpiderStates(this.gif);
+}
+
 enum Directions {
   right,
   left,

@@ -5,6 +5,7 @@ import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 
 final playerProvider =
     StateNotifierProvider<PlayerNotifier, PlayerState>((ref) {
@@ -115,10 +116,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
     checkCollisionsFirstDoor();
     checkCollisionsFirstChest();
+    checkCollisionsFirstSpider();
   }
 
   void moveLeft() {
@@ -149,11 +152,13 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
 
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
     checkCollisionsFirstDoor();
     checkCollisionsFirstChest();
+    checkCollisionsFirstSpider();
   }
 
   void stopMoving() {
@@ -165,6 +170,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     }
     checkCollisionsFirstDoor();
     checkCollisionsFirstChest();
+    checkCollisionsFirstSpider();
   }
 
   void checkCollisionsFirstDoor() {
@@ -186,6 +192,17 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       ref.read(chestProvider.notifier).openChest();
     } else {
       ref.read(chestProvider.notifier).closeChest();
+    }
+  }
+
+  void checkCollisionsFirstSpider() {
+    final isColliding =
+        ref.read(spiderProvider.notifier).isPlayerColliding(state.positionX);
+
+    if (isColliding) {
+      ref.read(spiderProvider.notifier).attack();
+    } else {
+      ref.read(spiderProvider.notifier).walk();
     }
   }
 }
