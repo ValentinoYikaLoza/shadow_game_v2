@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
@@ -19,6 +20,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
     final screen = MediaQuery.of(context);
     final playerState = ref.watch(playerProvider);
     final doorState = ref.watch(doorProvider);
+    final chestState = ref.watch(chestProvider);
     final dogState = ref.watch(dogProvider);
     return Scaffold(
       body: Stack(
@@ -45,7 +47,7 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
           ),
           //Puerta
           Positioned(
-            bottom: 60,
+            bottom: 63,
             left: doorState.initialPosition,
             child: Column(
               children: [
@@ -61,13 +63,14 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
               ],
             ),
           ),
+          // Cofre
           Positioned(
-            bottom: 60,
-            left: doorState.initialPosition,
+            bottom: 85,
+            left: chestState.initialPosition,
             child: SizedBox(
-              width: 100,
+              width: 60,
               child: Image.asset(
-                doorState.currentState.image,
+                chestState.currentState.image,
                 fit: BoxFit.cover,
               ),
             ),

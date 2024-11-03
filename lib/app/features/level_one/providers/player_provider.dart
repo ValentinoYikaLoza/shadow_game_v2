@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 
 final playerProvider =
@@ -16,7 +17,24 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   Timer? _jumpTimer;
   Timer? _fallTimer;
 
+  Timer? _inactivityTimer;
+
+  // Duración de tiempo para considerar inactividad
+  static const inactivityDuration = Duration(seconds: 5);
+
+  void _startInactivityTimer() {
+    _inactivityTimer?.cancel();
+    _inactivityTimer = Timer(inactivityDuration, () {
+      dance();  // Llama a dance si pasa el tiempo sin actividad
+    });
+  }
+
+  void resetInactivityTimer() {
+    _startInactivityTimer();
+  }
+
   void jump() {
+    resetInactivityTimer();
     if (!state.isJumping) {
       state = state.copyWith(
         isJumping: true,
@@ -38,6 +56,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void _startFalling() {
+    resetInactivityTimer();
     _fallTimer?.cancel();
     _fallTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (state.positionY >= 90) {
@@ -52,6 +71,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void land() {
+    resetInactivityTimer();
     state = state.copyWith(
       isJumping: false,
       currentState: PlayerStates.stay,
@@ -59,8 +79,15 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void attack() {
+    resetInactivityTimer();
     state = state.copyWith(
       currentState: PlayerStates.attack,
+    );
+  }
+
+  void dance() {
+    state = state.copyWith(
+      currentState: PlayerStates.dance,
     );
   }
 
@@ -68,6 +95,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   static const double leftBoundary = 20.0;
 
   void moveRight(double rightBoundary) {
+    resetInactivityTimer();
     final distanciaRecorrida = state.moveAmount * state.playerSpeed;
 
     if (state.positionX < rightBoundary / 1.5) {
@@ -86,12 +114,15 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
-    checkCollisions();
+    checkCollisionsFirstDoor();
+    checkCollisionsFirstChest();
   }
 
   void moveLeft() {
+    resetInactivityTimer();
     final distanciaRecorrida = -state.moveAmount * state.playerSpeed;
 
     // Verificar si se puede mover a la izquierda
@@ -117,30 +148,44 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
 
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
-    checkCollisions();
+    checkCollisionsFirstDoor();
+    checkCollisionsFirstChest();
   }
 
   void stopMoving() {
+    resetInactivityTimer();
     if (!state.isJumping) {
       state = state.copyWith(
         currentState: PlayerStates.stay,
       );
     }
-    checkCollisions();
+    checkCollisionsFirstDoor();
+    checkCollisionsFirstChest();
   }
 
-  void checkCollisions() {
-    final isColliding = ref
-        .read(doorProvider.notifier)
-        .isPlayerColliding(state.positionX, state.positionY);
+  void checkCollisionsFirstDoor() {
+    final isColliding =
+        ref.read(doorProvider.notifier).isPlayerColliding(state.positionX);
 
     if (isColliding) {
       ref.read(doorProvider.notifier).openDoor();
     } else {
       ref.read(doorProvider.notifier).closeDoor();
+    }
+  }
+
+  void checkCollisionsFirstChest() {
+    final isColliding =
+        ref.read(chestProvider.notifier).isPlayerColliding(state.positionX);
+
+    if (isColliding) {
+      ref.read(chestProvider.notifier).openChest();
+    } else {
+      ref.read(chestProvider.notifier).closeChest();
     }
   }
 }

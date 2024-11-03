@@ -18,19 +18,19 @@ class ChestNotifier extends StateNotifier<ChestState> {
     // print(state.initialPosition);
   }
 
-  void openDoor() {
+  void openChest() {
     state = state.copyWith(
       currentState: ChestStates.open,
     );
   }
 
-  void closeDoor() {
+  void closeChest() {
     state = state.copyWith(
       currentState: ChestStates.close,
     );
   }
 
-  bool isPlayerColliding(double playerX, double playerY) {
+  bool isPlayerColliding(double playerX) {
     // Define el área de colisión del objeto
     final objectLeft = state.initialPosition - (state.width / 2);
     final objectRight = state.initialPosition + (state.width / 2);
@@ -57,7 +57,7 @@ class ChestState {
   ChestState({
     this.initialPosition = 500,
     this.currentState = ChestStates.close,
-    this.width = 80,
+    this.width = 60,
   });
 
   ChestState copyWith({

@@ -2,7 +2,7 @@ enum PlayerStates {
   stay('assets/gifs/player/stay.gif'),
   walk('assets/gifs/player/walk.gif'),
   attack('assets/gifs/player/attack.gif'),
-  cut('assets/gifs/player/cut.gif'),
+  dance('assets/gifs/player/dance.gif'),
   jump('assets/gifs/player/jump.gif');
 
   final String gif;
@@ -26,8 +26,8 @@ enum DoorStates {
 }
 
 enum ChestStates {
-  open('assets/images/level_one/chest/open_door.png'),
-  close('assets/images/level_one/chest/close_door.png');
+  open('assets/images/level_one/chest/open_chest.png'),
+  close('assets/images/level_one/chest/close_chest.png');
 
   final String image;
   const ChestStates(this.image);
@@ -38,5 +38,3 @@ enum Directions {
   left,
   up;
 }
-
-
