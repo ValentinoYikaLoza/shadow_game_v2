@@ -19,6 +19,7 @@ class InterfaceButtons extends ConsumerWidget {
     return Stack(
       children: [
         child,
+        // coords
         Positioned(
           top: 20,
           left: 20,
@@ -32,7 +33,7 @@ class InterfaceButtons extends ConsumerWidget {
                 decoration: TextDecoration.none),
           ),
         ),
-        // Controles táctiles
+        // skill button
         Positioned(
           bottom: 40,
           left: screen.size.width / 2 - 36.5,

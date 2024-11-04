@@ -11,7 +11,8 @@ enum PlayerStates {
 
 enum ShadowStates {
   sit('assets/gifs/shadow/sit.gif'),
-  walk('assets/gifs/shadow/walk.gif');
+  walk('assets/gifs/shadow/walk.gif'),
+  bark('assets/gifs/shadow/bark.gif');
 
   final String gif;
   const ShadowStates(this.gif);

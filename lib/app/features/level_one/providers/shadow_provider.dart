@@ -58,6 +58,12 @@ class DogNotifier extends StateNotifier<DogState> {
       );
     }
   }
+
+  void changeState(ShadowStates newState) {
+    state = state.copyWith(
+      currentState: newState,
+    );
+  }
 }
 
 class DogState {

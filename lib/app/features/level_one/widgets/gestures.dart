@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
 class Gestures extends ConsumerStatefulWidget {
@@ -18,7 +17,6 @@ class GesturesState extends ConsumerState<Gestures> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context);
-    final playerState = ref.watch(playerProvider);
     return Stack(
       children: [
         widget.child,
@@ -71,9 +69,6 @@ class GesturesState extends ConsumerState<Gestures> {
                     ref
                         .read(playerProvider.notifier)
                         .moveRight(screen.size.width - 70);
-                    ref
-                        .read(backgroundProvider.notifier)
-                        .updateXCoords(playerState.playerSpeed);
                   });
                 },
                 onDoubleTapDown: (_) {

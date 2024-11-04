@@ -5,6 +5,7 @@ import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 
 final playerProvider =
@@ -26,7 +27,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
     _inactivityTimer = Timer(inactivityDuration, () {
-      dance();  // Llama a dance si pasa el tiempo sin actividad
+      dance(); // Llama a dance si pasa el tiempo sin actividad
     });
   }
 
@@ -84,6 +85,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     state = state.copyWith(
       currentState: PlayerStates.attack,
     );
+    ref.read(dogProvider.notifier).changeState(ShadowStates.bark);
   }
 
   void dance() {
@@ -204,6 +206,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     } else {
       ref.read(spiderProvider.notifier).walk();
     }
+  }
+
+  void changeState(PlayerStates newState) {
+    state = state.copyWith(
+      currentState: newState,
+    );
   }
 }
 
