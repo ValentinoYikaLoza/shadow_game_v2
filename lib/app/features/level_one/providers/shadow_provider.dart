@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
@@ -49,14 +50,21 @@ class DogNotifier extends StateNotifier<DogState> {
         currentDirection: Directions.right,
       );
     } else {
-      // Solo se sienta si no estaba caminando previamente
+      // si el jugador está quieto
       state = state.copyWith(
-        currentState: ShadowStates.sit,
+        currentState: state.isEnemyNear ? ShadowStates.bark : ShadowStates.sit,
         currentDirection: playerState.positionX < state.positionX
             ? Directions.left
             : Directions.right,
       );
     }
+  }
+
+  void help() {
+    state = state.copyWith(
+      isEnemyNear: true,
+      currentState: ShadowStates.bark,
+    );
   }
 
   void changeState(ShadowStates newState) {
@@ -71,10 +79,12 @@ class DogState {
   final double positionY;
   final ShadowStates currentState;
   final Directions currentDirection;
+  final bool isEnemyNear;
 
   DogState({
     this.positionX = 45,
     this.positionY = 82,
+    this.isEnemyNear = false,
     this.currentState = ShadowStates.sit,
     this.currentDirection = Directions.left,
   });
@@ -84,12 +94,14 @@ class DogState {
     double? positionY,
     ShadowStates? currentState,
     Directions? currentDirection,
+    bool? isEnemyNear,
   }) {
     return DogState(
       positionX: positionX ?? this.positionX,
       positionY: positionY ?? this.positionY,
       currentState: currentState ?? this.currentState,
       currentDirection: currentDirection ?? this.currentDirection,
+      isEnemyNear: isEnemyNear ?? this.isEnemyNear,
     );
   }
 }

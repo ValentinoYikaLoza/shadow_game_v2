@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 
 class Gestures extends ConsumerStatefulWidget {
   final Widget child;
@@ -17,6 +19,7 @@ class GesturesState extends ConsumerState<Gestures> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context);
+    final dogState = ref.watch(dogProvider);
     return Stack(
       children: [
         widget.child,
@@ -27,17 +30,23 @@ class GesturesState extends ConsumerState<Gestures> {
               child: GestureDetector(
                 onTapDown: (_) {
                   setState(() {
-                    ref.read(playerProvider.notifier).moveLeft();
+                    !dogState.isEnemyNear
+                        ? ref.read(playerProvider.notifier).moveLeft()
+                        : null;
                   });
                 },
                 onDoubleTapDown: (_) {
                   setState(() {
-                    ref.read(playerProvider.notifier).attack();
+                    !dogState.isEnemyNear
+                        ? ref.read(playerProvider.notifier).attack()
+                        : null;
                   });
                 },
                 onLongPressMoveUpdate: (_) {
                   setState(() {
-                    ref.read(playerProvider.notifier).moveLeft();
+                    dogState.isEnemyNear
+                        ? ref.read(playerProvider.notifier).moveLeft()
+                        : null;
                   });
                 },
                 onLongPressEnd: (_) {
@@ -66,21 +75,27 @@ class GesturesState extends ConsumerState<Gestures> {
               child: GestureDetector(
                 onTapDown: (_) {
                   setState(() {
-                    ref
-                        .read(playerProvider.notifier)
-                        .moveRight(screen.size.width - 70);
+                    !dogState.isEnemyNear
+                        ? ref
+                            .read(playerProvider.notifier)
+                            .moveRight(screen.size.width - 70)
+                        : null;
                   });
                 },
                 onDoubleTapDown: (_) {
                   setState(() {
-                    ref.read(playerProvider.notifier).attack();
+                    !dogState.isEnemyNear
+                        ? ref.read(playerProvider.notifier).attack()
+                        : null;
                   });
                 },
                 onLongPressMoveUpdate: (_) {
                   setState(() {
-                    ref
-                        .read(playerProvider.notifier)
-                        .moveRight(screen.size.width - 70);
+                    !dogState.isEnemyNear
+                        ? ref
+                            .read(playerProvider.notifier)
+                            .moveRight(screen.size.width - 70)
+                        : null;
                   });
                 },
                 onLongPressEnd: (_) {

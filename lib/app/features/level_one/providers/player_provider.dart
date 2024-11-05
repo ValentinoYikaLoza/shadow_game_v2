@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
@@ -22,7 +23,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   Timer? _inactivityTimer;
 
   // Duración de tiempo para considerar inactividad
-  static const inactivityDuration = Duration(seconds: 5);
+  static const inactivityDuration = Duration(minutes: 5);
 
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
@@ -78,14 +79,6 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       isJumping: false,
       currentState: PlayerStates.stay,
     );
-  }
-
-  void attack() {
-    resetInactivityTimer();
-    state = state.copyWith(
-      currentState: PlayerStates.attack,
-    );
-    ref.read(dogProvider.notifier).changeState(ShadowStates.bark);
   }
 
   void dance() {
@@ -202,9 +195,17 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         ref.read(spiderProvider.notifier).isPlayerColliding(state.positionX);
 
     if (isColliding) {
-      ref.read(spiderProvider.notifier).attack();
+      ref.read(spiderProvider.notifier).changeState(SpiderStates.attack);
+      state = state.copyWith(
+        moveAmount: 0,
+        playerSpeed: 0,
+      );
+      ref.read(dogProvider.notifier).help();
     } else {
-      ref.read(spiderProvider.notifier).walk();
+      state = state.copyWith(
+        moveAmount: 10,
+        playerSpeed: 0.2,
+      );
     }
   }
 
@@ -212,6 +213,68 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     state = state.copyWith(
       currentState: newState,
     );
+  }
+
+  void takeDamage(double damage) {
+    if (state.isInvulnerable || !state.isAlive) return;
+
+    final newHealth = state.health - damage;
+    if (newHealth <= 0) {
+      die();
+    } else {
+      state = state.copyWith(
+        health: newHealth,
+        isInvulnerable: true,
+      );
+
+      // Invulnerability period after taking damage
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          state = state.copyWith(isInvulnerable: false);
+        }
+      });
+
+      // Return to normal state after hurt animation
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          state = state.copyWith(currentState: PlayerStates.stay);
+        }
+      });
+    }
+  }
+
+  void die() {
+    state = state.copyWith(
+      health: 0,
+      isAlive: false,
+      moveAmount: 0,
+      playerSpeed: 0,
+    );
+    // You might want to trigger game over screen or restart mechanism here
+  }
+
+  void heal(double amount) {
+    if (!state.isAlive) return;
+
+    final double newHealth = (state.health + amount).clamp(0, state.maxHealth);
+    state = state.copyWith(health: newHealth);
+  }
+
+  void attack() {
+    if (!state.isAlive) return;
+
+    resetInactivityTimer();
+    state = state.copyWith(
+      currentState: PlayerStates.attack,
+    );
+
+    // Check if spider is in range and deal damage
+    final spiderNotifier = ref.read(spiderProvider.notifier);
+    if (spiderNotifier.isPlayerColliding(state.positionX)) {
+      spiderNotifier.takeDamage(state.attackDamage);
+    }
+
+    ref.read(dogProvider.notifier).changeState(ShadowStates.bark);
   }
 }
 
@@ -225,6 +288,11 @@ class PlayerState {
   final PlayerStates currentState;
   final double moveAmount;
   final double playerSpeed;
+  final double health;
+  final double maxHealth;
+  final double attackDamage;
+  final bool isInvulnerable;
+  final bool isAlive;
 
   PlayerState({
     this.skyPosition = 0,
@@ -236,6 +304,11 @@ class PlayerState {
     this.currentState = PlayerStates.stay,
     this.moveAmount = 10,
     this.playerSpeed = 0.2,
+    this.health = 10,
+    this.maxHealth = 10,
+    this.attackDamage = 20,
+    this.isInvulnerable = false,
+    this.isAlive = true,
   });
 
   PlayerState copyWith({
@@ -248,6 +321,11 @@ class PlayerState {
     PlayerStates? currentState,
     double? moveAmount,
     double? playerSpeed,
+    double? health,
+    double? maxHealth,
+    double? attackDamage,
+    bool? isInvulnerable,
+    bool? isAlive,
   }) {
     return PlayerState(
       skyPosition: skyPosition ?? this.skyPosition,
@@ -259,6 +337,11 @@ class PlayerState {
       currentState: currentState ?? this.currentState,
       moveAmount: moveAmount ?? this.moveAmount,
       playerSpeed: playerSpeed ?? this.playerSpeed,
+      health: health ?? this.health,
+      maxHealth: maxHealth ?? this.maxHealth,
+      attackDamage: attackDamage ?? this.attackDamage,
+      isInvulnerable: isInvulnerable ?? this.isInvulnerable,
+      isAlive: isAlive ?? this.isAlive,
     );
   }
 }

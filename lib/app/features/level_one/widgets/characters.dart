@@ -17,6 +17,49 @@ class Characters extends ConsumerStatefulWidget {
 }
 
 class CharactersState extends ConsumerState<Characters> {
+  Widget _buildHealthHearts(double health, double maxHealth) {
+    double totalHearts = maxHealth; // Total de corazones
+    double fullHearts = health; // Número de corazones llenos
+
+    return SizedBox(
+      height: 50,
+      width: 20 * maxHealth,
+      child: Stack(
+        children: List.generate(totalHearts.toInt(), (index) {
+          double offset =
+              index * 18.0; // Desplazamiento para que se superpongan
+
+          Widget heart = (index < fullHearts)
+              ? SizedBox(
+                  width: 40,
+                  child: Image.asset(
+                    'assets/icons/life.png',
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : SizedBox(
+                  width: 40,
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.mode(
+                      Colors.grey,
+                      BlendMode.srcATop,
+                    ),
+                    child: Image.asset(
+                      'assets/icons/life.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+
+          return Positioned(
+            left: offset, // Desplazamiento para superponer los corazones
+            child: heart,
+          );
+        }),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // final screen = MediaQuery.of(context);
@@ -41,7 +84,6 @@ class CharactersState extends ConsumerState<Characters> {
                 ref
                     .read(playerProvider.notifier)
                     .changeState(PlayerStates.stay);
-                ref.read(dogProvider.notifier).changeState(ShadowStates.sit);
               });
             },
             onTapUp: (_) {
@@ -49,21 +91,28 @@ class CharactersState extends ConsumerState<Characters> {
                 ref
                     .read(playerProvider.notifier)
                     .changeState(PlayerStates.stay);
-                ref.read(dogProvider.notifier).changeState(ShadowStates.sit);
               });
             },
-            child: SizedBox(
-              width: 100,
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationY(
-                  spiderState.currentDirection != Directions.left ? 3.14159 : 0,
+            child: Column(
+              children: [
+                if (spiderState.isAlive)
+                  _buildHealthHearts(spiderState.health, 5),
+                SizedBox(
+                  width: 100,
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.rotationY(
+                      spiderState.currentDirection != Directions.left
+                          ? 3.14159
+                          : 0,
+                    ),
+                    child: Image.asset(
+                      spiderState.currentState.gif,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                child: Image.asset(
-                  spiderState.currentState.gif,
-                  fit: BoxFit.cover,
-                ),
-              ),
+              ],
             ),
           ),
         ),
