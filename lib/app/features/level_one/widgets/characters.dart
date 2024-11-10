@@ -57,27 +57,15 @@ class CharactersState extends ConsumerState<Characters> {
                   totalHearts: spiderState.maxHealth,
                   fullHearts: spiderState.health,
                 ),
-                SizedBox(
-                  width: 100,
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.rotationY(
-                      spiderState.currentDirection != Directions.left
-                          ? 3.14159
-                          : 0,
-                    ),
-                    child: SizedBox(
-                      height: 77,
-                      width: 95,
-                      child: CustomAnimatedSpriteWidget(
-                        spritePath: spiderState.currentState.sheet,
-                        frameWidth: 95,
-                        frameHeight: 77,
-                        frameCount: spiderState.currentState.frames,
-                        stepTime: 0.2,
-                      ),
-                    ),
-                  ),
+                CustomAnimatedSpriteWidget(
+                  spritePath: spiderState.currentState.sheet,
+                  width: 95,
+                  frameWidth: 95,
+                  frameHeight: 77,
+                  frameCount: spiderState.currentState.frames,
+                  stepTime: 0.2,
+                  flipHorizontally:
+                      spiderState.currentDirection != Directions.left,
                 ),
               ],
             ),
@@ -103,22 +91,14 @@ class CharactersState extends ConsumerState<Characters> {
                 ref.read(dogProvider.notifier).changeState(ShadowStates.sit);
               });
             },
-            child: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationY(
-                dogState.currentDirection == Directions.left ? 3.14159 : 0,
-              ),
-              child: SizedBox(
-                height: 72,
-                width: 100,
-                child: CustomAnimatedSpriteWidget(
-                  spritePath: dogState.currentState.sheet,
-                  frameWidth: 100,
-                  frameHeight: 72,
-                  frameCount: dogState.currentState.frames,
-                  stepTime: 0.15,
-                ),
-              ),
+            child: CustomAnimatedSpriteWidget(
+              spritePath: dogState.currentState.sheet,
+              width: 80,
+              frameWidth: 100,
+              frameHeight: 72,
+              frameCount: dogState.currentState.frames,
+              stepTime: 0.15,
+              flipHorizontally: dogState.currentDirection == Directions.left,
             ),
           ),
         ),
@@ -130,22 +110,15 @@ class CharactersState extends ConsumerState<Characters> {
             onLongPressDown: (_) {
               setState(() {});
             },
-            child: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationY(
-                playerState.currentDirection == Directions.left ? 3.14159 : 0,
-              ),
-              child: SizedBox(
-                height: 50,
-                width: 50,
-                child: CustomAnimatedSpriteWidget(
-                  spritePath: playerState.currentState.sheet,
-                  frameWidth: 50,
-                  frameHeight: 50,
-                  frameCount: playerState.currentState.frames,
-                  stepTime: 0.2,
-                ),
-              ),
+            child: CustomAnimatedSpriteWidget(
+              spritePath: playerState.currentState.sheet,
+              width: 50,
+              frameWidth: 50,
+              frameHeight: 50,
+              frameCount: playerState.currentState.frames,
+              stepTime: 0.2,
+              flipHorizontally:
+                  playerState.currentDirection == Directions.left,
             ),
           ),
         ),
