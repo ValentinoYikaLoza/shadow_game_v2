@@ -34,7 +34,9 @@ class CharactersState extends ConsumerState<Characters> {
           child: GestureDetector(
             onLongPressDown: (_) {
               setState(() {
-                ref.read(playerProvider.notifier).attack();
+                dogState.isEnemyNear
+                    ? ref.read(playerProvider.notifier).attack()
+                    : null;
               });
             },
             onLongPressEnd: (_) {
@@ -63,10 +65,19 @@ class CharactersState extends ConsumerState<Characters> {
                   frameWidth: 95,
                   frameHeight: 77,
                   frameCount: spiderState.currentState.frames,
-                  stepTime: 0.2,
-                  loop: spiderState.currentState != SpiderStates.die,
+                  stepTime: spiderState.currentState.fps,
+                  loop: spiderState.currentState.loop,
                   flipHorizontally:
                       spiderState.currentDirection != Directions.left,
+                  onLastFrame: () {
+                    if (spiderState.currentState == SpiderStates.attack) {
+                      setState(() {
+                        ref
+                            .read(playerProvider.notifier)
+                            .takeDamage(spiderState.attackDamage);
+                      });
+                    }
+                  },
                 ),
               ],
             ),
@@ -98,7 +109,8 @@ class CharactersState extends ConsumerState<Characters> {
               frameWidth: 100,
               frameHeight: 72,
               frameCount: dogState.currentState.frames,
-              stepTime: 0.15,
+              stepTime: dogState.currentState.fps,
+              loop: dogState.currentState.loop,
               flipHorizontally: dogState.currentDirection == Directions.left,
             ),
           ),
@@ -117,7 +129,8 @@ class CharactersState extends ConsumerState<Characters> {
               frameWidth: 50,
               frameHeight: 50,
               frameCount: playerState.currentState.frames,
-              stepTime: 0.2,
+              stepTime: playerState.currentState.fps,
+              loop: playerState.currentState.loop,
               flipHorizontally: playerState.currentDirection == Directions.left,
             ),
           ),
