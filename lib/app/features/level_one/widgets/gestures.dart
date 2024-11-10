@@ -36,9 +36,10 @@ class GesturesState extends ConsumerState<Gestures> {
                 },
                 onLongPressMoveUpdate: (_) {
                   setState(() {
-                    dogState.isEnemyNear
+                    !dogState.isEnemyNear
                         ? ref.read(playerProvider.notifier).moveLeft()
                         : null;
+                        print(dogState.positionX);
                   });
                 },
                 onLongPressEnd: (_) {
