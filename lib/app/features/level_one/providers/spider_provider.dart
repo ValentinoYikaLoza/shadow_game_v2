@@ -49,13 +49,22 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
       );
     } else {
       // ataca
-      state = state.copyWith(
-        currentState:
-            state.health <= 0 ? SpiderStates.die : SpiderStates.attack,
-        currentDirection: playerState.positionX < state.initialPosition
-            ? Directions.left
-            : Directions.right,
-      );
+      if (!isPlayerColliding(playerState.positionX)) {
+        state = state.copyWith(
+          currentState: SpiderStates.stay,
+          currentDirection: playerState.positionX < state.initialPosition
+              ? Directions.left
+              : Directions.right,
+        );
+      } else {
+        state = state.copyWith(
+          currentState:
+              state.health <= 0 ? SpiderStates.die : SpiderStates.attack,
+          currentDirection: playerState.positionX < state.initialPosition
+              ? Directions.left
+              : Directions.right,
+        );
+      }
     }
   }
 
