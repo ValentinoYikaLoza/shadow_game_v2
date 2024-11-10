@@ -90,6 +90,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     );
   }
 
+  //verificar porque el state.copywith no funciona
   void die() {
     print('muelto');
     state = state.copyWith(
@@ -97,6 +98,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     );
   }
 
+  //verificar si este funciona
   void attackPlayer() {
     state = state.copyWith(
       currentState: SpiderStates.attack,
