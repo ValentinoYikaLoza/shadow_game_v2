@@ -64,6 +64,7 @@ class CharactersState extends ConsumerState<Characters> {
                   frameHeight: 77,
                   frameCount: spiderState.currentState.frames,
                   stepTime: 0.2,
+                  loop: spiderState.currentState != SpiderStates.die,
                   flipHorizontally:
                       spiderState.currentDirection != Directions.left,
                 ),
@@ -117,8 +118,7 @@ class CharactersState extends ConsumerState<Characters> {
               frameHeight: 50,
               frameCount: playerState.currentState.frames,
               stepTime: 0.2,
-              flipHorizontally:
-                  playerState.currentDirection == Directions.left,
+              flipHorizontally: playerState.currentDirection == Directions.left,
             ),
           ),
         ),

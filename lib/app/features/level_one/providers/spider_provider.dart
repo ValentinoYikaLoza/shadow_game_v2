@@ -50,7 +50,8 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     } else {
       // ataca
       state = state.copyWith(
-        currentState: SpiderStates.stay,
+        currentState:
+            state.health <= 0 ? SpiderStates.die : SpiderStates.attack,
         currentDirection: playerState.positionX < state.initialPosition
             ? Directions.left
             : Directions.right,
@@ -83,18 +84,14 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
   }
 
   void takeDamage(double damage) {
+    final newHealth = state.health - damage;
     state = state.copyWith(
-      health: state.health - damage,
+      health: newHealth,
     );
-    if (state.health > 0) {
-      print('araña: ${state.health}');
-    }else{
-      die();
-      print('araña: muelto');
-    }
   }
 
   void die() {
+    print('muelto');
     state = state.copyWith(
       currentState: SpiderStates.die,
     );

@@ -1,3 +1,6 @@
+// cada animacion debe venir con su propia velocidad y estado de bucle,
+// agregar eso como parámtros
+
 enum PlayerStates {
   stay('sheets/player/stay.png', 4),
   walk('sheets/player/walk.png', 8),
