@@ -58,7 +58,7 @@ class DogNotifier extends StateNotifier<DogState> {
             : Directions.right,
       );
     }
-  }
+  } 
 
   void help() {
     state = state.copyWith(

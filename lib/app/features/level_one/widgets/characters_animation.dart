@@ -239,7 +239,6 @@ class CustomSpriteAnimationComponent extends SpriteAnimationComponent {
       // Solo llama a la función cuando es el último frame
       if (_currentFrame == frameCount - 1) {
         onLastFrame?.call();
-        debugPrint('Último frame alcanzado');
       }
     }
   }
