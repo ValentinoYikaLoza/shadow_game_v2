@@ -48,9 +48,9 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
         currentDirection: Directions.right,
       );
     } else {
-      // Solo se sienta si no estaba caminando previamente
+      // ataca
       state = state.copyWith(
-        currentState: SpiderStates.attack,
+        currentState: SpiderStates.stay,
         currentDirection: playerState.positionX < state.initialPosition
             ? Directions.left
             : Directions.right,
@@ -83,38 +83,29 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
   }
 
   void takeDamage(double damage) {
-    final newHealth = state.health - damage;
-    if (newHealth <= 0) {
+    state = state.copyWith(
+      health: state.health - damage,
+    );
+    if (state.health > 0) {
+      print('araña: ${state.health}');
+    }else{
       die();
-    } else {
-      state = state.copyWith(
-        health: newHealth,
-      );
-      // Return to normal state after hurt animation
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          state = state.copyWith(currentState: SpiderStates.stay);
-        }
-      });
+      print('araña: muelto');
     }
   }
 
   void die() {
     state = state.copyWith(
-      health: 0,
       currentState: SpiderStates.die,
-      isAlive: false,
     );
-    // You might want to trigger some game events here
   }
 
   void attackPlayer() {
-    if (!state.isAlive) return;
+    state = state.copyWith(
+      currentState: SpiderStates.attack,
+    );
 
-    final playerNotifier = ref.read(playerProvider.notifier);
-    if (isPlayerColliding(ref.read(playerProvider).positionX)) {
-      playerNotifier.takeDamage(state.attackDamage);
-    }
+    ref.read(playerProvider.notifier).takeDamage(state.attackDamage);
   }
 }
 
@@ -124,8 +115,8 @@ class SpiderState {
   final Directions currentDirection;
   final double width;
   final double health;
+  final double maxHealth;
   final double attackDamage;
-  final bool isAlive;
 
   SpiderState({
     this.initialPosition = 500,
@@ -133,8 +124,8 @@ class SpiderState {
     this.currentDirection = Directions.left,
     this.width = 200,
     this.health = 5,
-    this.attackDamage = 10,
-    this.isAlive = true,
+    this.maxHealth = 5,
+    this.attackDamage = 1,
   });
 
   SpiderState copyWith({
@@ -143,8 +134,8 @@ class SpiderState {
     Directions? currentDirection,
     double? width,
     double? health,
+    double? maxHealth,
     double? attackDamage,
-    bool? isAlive,
   }) {
     return SpiderState(
       initialPosition: initialPosition ?? this.initialPosition,
@@ -152,8 +143,8 @@ class SpiderState {
       currentDirection: currentDirection ?? this.currentDirection,
       width: width ?? this.width,
       health: health ?? this.health,
+      maxHealth: maxHealth ?? this.maxHealth,
       attackDamage: attackDamage ?? this.attackDamage,
-      isAlive: isAlive ?? this.isAlive,
     );
   }
 }

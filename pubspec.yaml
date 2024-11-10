@@ -7,6 +7,7 @@ environment:
   sdk: ">=3.3.2 <4.0.0"
 
 dependencies:
+  flame: ^1.21.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -16,6 +17,7 @@ dependencies:
   go_router: ^14.2.7
   intl: ^0.19.0
   shared_preferences: ^2.3.2
+  spritewidget: ^2.0.1
 
 dev_dependencies:
   flutter_lints: ^4.0.0
@@ -25,7 +27,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/icons/
     - assets/images/level_one/
     - assets/images/level_one/door/
     - assets/images/level_one/chest/
@@ -38,4 +39,7 @@ flutter:
     - assets/gifs/shadow/
     - assets/gifs/spider/
     - assets/gifs/
+    - assets/images/sheets/player/
+    - assets/images/sheets/shadow/
+    - assets/images/sheets/spider/
     - assets/icons/

@@ -4,6 +4,8 @@ import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/lifebar.dart';
 
 class Characters extends ConsumerStatefulWidget {
   final Widget child;
@@ -17,52 +19,8 @@ class Characters extends ConsumerStatefulWidget {
 }
 
 class CharactersState extends ConsumerState<Characters> {
-  Widget _buildHealthHearts(double health, double maxHealth) {
-    double totalHearts = maxHealth; // Total de corazones
-    double fullHearts = health; // Número de corazones llenos
-
-    return SizedBox(
-      height: 50,
-      width: 20 * maxHealth,
-      child: Stack(
-        children: List.generate(totalHearts.toInt(), (index) {
-          double offset =
-              index * 18.0; // Desplazamiento para que se superpongan
-
-          Widget heart = (index < fullHearts)
-              ? SizedBox(
-                  width: 40,
-                  child: Image.asset(
-                    'assets/icons/life.png',
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : SizedBox(
-                  width: 40,
-                  child: ColorFiltered(
-                    colorFilter: const ColorFilter.mode(
-                      Colors.grey,
-                      BlendMode.srcATop,
-                    ),
-                    child: Image.asset(
-                      'assets/icons/life.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                );
-
-          return Positioned(
-            left: offset, // Desplazamiento para superponer los corazones
-            child: heart,
-          );
-        }),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // final screen = MediaQuery.of(context);
     final playerState = ref.watch(playerProvider);
     final dogState = ref.watch(dogProvider);
     final spiderState = ref.watch(spiderProvider);
@@ -95,8 +53,10 @@ class CharactersState extends ConsumerState<Characters> {
             },
             child: Column(
               children: [
-                if (spiderState.isAlive)
-                  _buildHealthHearts(spiderState.health, 5),
+                Lifebar(
+                  totalHearts: spiderState.maxHealth,
+                  fullHearts: spiderState.health,
+                ),
                 SizedBox(
                   width: 100,
                   child: Transform(
@@ -106,9 +66,16 @@ class CharactersState extends ConsumerState<Characters> {
                           ? 3.14159
                           : 0,
                     ),
-                    child: Image.asset(
-                      spiderState.currentState.gif,
-                      fit: BoxFit.cover,
+                    child: SizedBox(
+                      height: 77,
+                      width: 95,
+                      child: CustomAnimatedSpriteWidget(
+                        spritePath: spiderState.currentState.sheet,
+                        frameWidth: 95,
+                        frameHeight: 77,
+                        frameCount: spiderState.currentState.frames,
+                        stepTime: 0.2,
+                      ),
                     ),
                   ),
                 ),
@@ -141,11 +108,16 @@ class CharactersState extends ConsumerState<Characters> {
               transform: Matrix4.rotationY(
                 dogState.currentDirection == Directions.left ? 3.14159 : 0,
               ),
-              child: Image.asset(
-                width: 80,
-                dogState.currentState.gif,
-                gaplessPlayback: true,
-                key: ValueKey('${dogState.currentState}-${1}'),
+              child: SizedBox(
+                height: 72,
+                width: 100,
+                child: CustomAnimatedSpriteWidget(
+                  spritePath: dogState.currentState.sheet,
+                  frameWidth: 100,
+                  frameHeight: 72,
+                  frameCount: dogState.currentState.frames,
+                  stepTime: 0.15,
+                ),
               ),
             ),
           ),
@@ -163,10 +135,16 @@ class CharactersState extends ConsumerState<Characters> {
               transform: Matrix4.rotationY(
                 playerState.currentDirection == Directions.left ? 3.14159 : 0,
               ),
-              child: Image.asset(
-                playerState.currentState.gif,
-                gaplessPlayback: true,
-                key: ValueKey('${playerState.currentState}-${1}'),
+              child: SizedBox(
+                height: 50,
+                width: 50,
+                child: CustomAnimatedSpriteWidget(
+                  spritePath: playerState.currentState.sheet,
+                  frameWidth: 50,
+                  frameHeight: 50,
+                  frameCount: playerState.currentState.frames,
+                  stepTime: 0.2,
+                ),
               ),
             ),
           ),

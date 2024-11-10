@@ -1,21 +1,34 @@
 enum PlayerStates {
-  stay('assets/gifs/player/stay.gif'),
-  walk('assets/gifs/player/walk.gif'),
-  attack('assets/gifs/player/attack.gif'),
-  dance('assets/gifs/player/dance.gif'),
-  jump('assets/gifs/player/jump.gif');
+  stay('sheets/player/stay.png', 4),
+  walk('sheets/player/walk.png', 8),
+  attack('sheets/player/attack.png', 4),
+  dance('sheets/player/dance.png', 10),
+  jump('sheets/player/jump.png', 5);
 
-  final String gif;
-  const PlayerStates(this.gif);
+  final String sheet;
+  final int frames;
+  const PlayerStates(this.sheet, this.frames);
 }
 
 enum ShadowStates {
-  sit('assets/gifs/shadow/sit.gif'),
-  walk('assets/gifs/shadow/walk.gif'),
-  bark('assets/gifs/shadow/bark.gif');
+  sit('sheets/shadow/sit.png', 6),
+  walk('sheets/shadow/walk.png', 4),
+  bark('sheets/shadow/bark.png', 8);
 
-  final String gif;
-  const ShadowStates(this.gif);
+  final String sheet;
+  final int frames;
+  const ShadowStates(this.sheet, this.frames);
+}
+
+enum SpiderStates {
+  stay('sheets/spider/stay.png', 5),
+  walk('sheets/spider/walk.png', 4),
+  attack('sheets/spider/attack.png', 16),
+  die('sheets/spider/die.png', 17);
+
+  final String sheet;
+  final int frames;
+  const SpiderStates(this.sheet, this.frames);
 }
 
 enum DoorStates {
@@ -32,16 +45,6 @@ enum ChestStates {
 
   final String image;
   const ChestStates(this.image);
-}
-
-enum SpiderStates {
-  stay('assets/gifs/spider/stay.gif'),
-  walk('assets/gifs/spider/walk.gif'),
-  attack('assets/gifs/spider/attack.gif'),
-  die('assets/gifs/spider/die.gif');
-
-  final String gif;
-  const SpiderStates(this.gif);
 }
 
 enum Directions {
