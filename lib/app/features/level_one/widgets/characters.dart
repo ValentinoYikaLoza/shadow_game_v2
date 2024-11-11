@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/lifebar.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/spider.dart';
 
 class Characters extends ConsumerStatefulWidget {
   final Widget child;
@@ -20,68 +22,28 @@ class Characters extends ConsumerStatefulWidget {
 
 class CharactersState extends ConsumerState<Characters> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.read(spider2Provider.notifier).addSpider();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final playerState = ref.watch(playerProvider);
     final dogState = ref.watch(dogProvider);
-    final spiderState = ref.watch(spiderProvider);
+    final spiderState = ref.watch(spider2Provider);
     return Stack(
       children: [
         widget.child,
         // Enemigo araña
-        Positioned(
-          bottom: 80,
-          left: spiderState.initialPosition,
-          child: GestureDetector(
-            onLongPressDown: (_) {
-              setState(() {
-                dogState.isEnemyNear
-                    ? ref.read(playerProvider.notifier).attack()
-                    : null;
-              });
-            },
-            onLongPressEnd: (_) {
-              setState(() {
-                ref
-                    .read(playerProvider.notifier)
-                    .changeState(PlayerStates.stay);
-              });
-            },
-            onTapUp: (_) {
-              setState(() {
-                ref
-                    .read(playerProvider.notifier)
-                    .changeState(PlayerStates.stay);
-              });
-            },
-            child: Column(
-              children: [
-                Lifebar(
-                  totalHearts: spiderState.maxHealth,
-                  fullHearts: spiderState.health,
-                ),
-                CustomAnimatedSpriteWidget(
-                  spritePath: spiderState.currentState.sheet,
-                  width: 95,
-                  frameWidth: 95,
-                  frameHeight: 77,
-                  frameCount: spiderState.currentState.frames,
-                  stepTime: spiderState.currentState.fps,
-                  loop: spiderState.currentState.loop,
-                  flipHorizontally:
-                      spiderState.currentDirection != Directions.left,
-                  onLastFrame: () {
-                    if (spiderState.currentState == SpiderStates.attack) {
-                      setState(() {
-                        ref
-                            .read(playerProvider.notifier)
-                            .takeDamage(spiderState.attackDamage);
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
+        ...List.generate(
+          spiderState.spiders.length,
+          (index) {
+            final spider = spiderState.spiders[index];
+            return SpiderWidget(spider: spider);
+          },
         ),
         // Perro
         Positioned(

@@ -3,16 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
-final spiderProvider =
-    StateNotifierProvider<SpiderNotifier, SpiderState>((ref) {
-  return SpiderNotifier(ref);
-});
+// final spiderProvider =
+//     StateNotifierProvider<SpiderNotifier, SpiderState>((ref) {
+//   return SpiderNotifier(ref);
+// });
 
 class SpiderNotifier extends StateNotifier<SpiderState> {
   SpiderNotifier(this.ref) : super(SpiderState()) {
     // Escuchar los cambios del jugador para actualizar la posición y dirección del perro
     ref.listen(playerProvider, (previous, next) {
-      followPlayer(previous, next);
+      followPlayer(next);
     });
   }
   final Ref ref;
@@ -23,17 +23,16 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     state = state.copyWith(
       initialPosition: newPosition.roundToDouble(),
     );
-    // print(state.initialPosition);
   }
 
-  void followPlayer(PlayerState? previousState, PlayerState playerState) {
+  void followPlayer(PlayerState playerState) {
     // Definimos la distancia a mantener detrás del jugador
     const double followDistance = 100.0;
 
     // Actualizar la posición y dirección del perro para que siga al jugador
     if (playerState.positionX < state.initialPosition - followDistance &&
         isPlayerColliding(playerState.positionX)) {
-      // Si el jugador está a la izquierda y el perro está demasiado lejos
+      // Si el jugador está a la izquierda y la araña está demasiado lejos       
       state = state.copyWith(
         initialPosition: playerState.positionX + followDistance,
         currentState: SpiderStates.walk,
@@ -101,7 +100,6 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
   //verificar porque el state.copywith no funciona
   void die() {
-    print('muelto');
     state = state.copyWith(
       currentState: SpiderStates.die,
     );

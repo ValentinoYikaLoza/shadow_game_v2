@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
 
 class Gestures extends ConsumerStatefulWidget {
   final Widget child;
@@ -18,7 +20,8 @@ class GesturesState extends ConsumerState<Gestures> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context);
-    final dogState = ref.watch(dogProvider);
+    final spiderState = ref.watch(spider2Provider);
+
     return Stack(
       children: [
         widget.child,
@@ -29,17 +32,34 @@ class GesturesState extends ConsumerState<Gestures> {
               child: GestureDetector(
                 onTapDown: (_) {
                   setState(() {
-                    !dogState.isEnemyNear
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
                         ? ref.read(playerProvider.notifier).moveLeft()
                         : null;
                   });
                 },
                 onLongPressMoveUpdate: (_) {
                   setState(() {
-                    !dogState.isEnemyNear
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
                         ? ref.read(playerProvider.notifier).moveLeft()
                         : null;
-                        print(dogState.positionX);
                   });
                 },
                 onLongPressEnd: (_) {
@@ -68,7 +88,16 @@ class GesturesState extends ConsumerState<Gestures> {
               child: GestureDetector(
                 onTapDown: (_) {
                   setState(() {
-                    !dogState.isEnemyNear
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
                         ? ref
                             .read(playerProvider.notifier)
                             .moveRight(screen.size.width - 70)
@@ -77,7 +106,16 @@ class GesturesState extends ConsumerState<Gestures> {
                 },
                 onLongPressMoveUpdate: (_) {
                   setState(() {
-                    !dogState.isEnemyNear
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
                         ? ref
                             .read(playerProvider.notifier)
                             .moveRight(screen.size.width - 70)

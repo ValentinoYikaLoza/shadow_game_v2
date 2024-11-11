@@ -7,6 +7,7 @@ import 'package:shadow_game_v2/app/features/level_one/providers/background_provi
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 
 final playerProvider =
@@ -111,12 +112,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
+      // ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
     checkCollisionsFirstDoor();
     checkCollisionsFirstChest();
-    checkCollisionsFirstSpider();
+    checkCollisionsSpiders();
   }
 
   void moveLeft() {
@@ -147,13 +148,13 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
+      // ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
 
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
     checkCollisionsFirstDoor();
     checkCollisionsFirstChest();
-    checkCollisionsFirstSpider();
+    checkCollisionsSpiders();
   }
 
   void stopMoving() {
@@ -165,7 +166,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     }
     checkCollisionsFirstDoor();
     checkCollisionsFirstChest();
-    checkCollisionsFirstSpider();
+    checkCollisionsSpiders();
   }
 
   void checkCollisionsFirstDoor() {
@@ -190,12 +191,20 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     }
   }
 
-  void checkCollisionsFirstSpider() {
-    final isColliding =
-        ref.read(spiderProvider.notifier).isPlayerColliding(state.positionX);
+  void checkCollisionsSpiders() {
+    ref.read(spider2Provider.notifier).isAnySpiderNear(state.positionX);
+    final spidersIndex = ref.read(spider2Provider);
 
-    if (isColliding) {
-      ref.read(spiderProvider.notifier).changeState(SpiderStates.attack);
+    if (spidersIndex.spiders
+        .where(
+          (spider) {
+            return spider.currentState == SpiderStates.walk ||
+                spider.currentState == SpiderStates.attack;
+          },
+        )
+        .toList()
+        .isNotEmpty) {
+      // ref.read(spiderProvider.notifier).changeState(SpiderStates.attack);
       state = state.copyWith(
         moveAmount: 0,
         playerSpeed: 0,
@@ -221,7 +230,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     );
     if (state.health > 0) {
       print('jugador: ${state.health}');
-    }else{
+    } else {
       print('jugador: muelto');
     }
   }
@@ -234,7 +243,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       currentState: PlayerStates.attack,
     );
 
-    ref.read(spiderProvider.notifier).takeDamage(state.attackDamage);
+    ref.read(spider2Provider.notifier).takeDamage(state.attackDamage);
 
     ref.read(dogProvider.notifier).changeState(ShadowStates.bark);
   }
