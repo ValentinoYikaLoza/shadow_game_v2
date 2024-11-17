@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
 
@@ -57,14 +56,13 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final dogState = ref.watch(dogProvider);
     return Positioned(
       bottom: 80,
       left: widget.spider.initialPosition,
       child: GestureDetector(
         onLongPressDown: (_) {
           setState(() {
-            dogState.isEnemyNear
+            widget.spider.currentState == SpiderStates.attack
                 ? ref.read(playerProvider.notifier).attack()
                 : null;
           });

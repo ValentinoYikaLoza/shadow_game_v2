@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,11 +18,28 @@ class Spider2Notifier extends StateNotifier<SpiderState> {
   Timer? moveTimer;
   Timer? disapearTimer;
 
-  void addSpider() {
-    state = state.copyWith(
-      spiders: [...state.spiders, Spider()],
-    );
+  void addSpider({double initialPosition = 1000}) {
+    if (state.spiders.length <= 10) {
+      state = state.copyWith(
+        spiders: [...state.spiders, Spider(initialPosition: initialPosition)],
+      );
+    }
     startMoving();
+  }
+
+  // void killSpider(Spider spider) {
+  //   state.spiders.remove(spider);
+  // }
+
+  void updateXCoords(double distanciaRecorrida) {
+    state = state.copyWith(
+        spiders: state.spiders.map((spider) {
+      final newPosition = spider.initialPosition + distanciaRecorrida;
+
+      return spider.copyWith(
+        initialPosition: newPosition.roundToDouble(),
+      );
+    }).toList());
   }
 
   bool isPlayerColliding(double playerX, Spider spider) {
@@ -72,7 +90,9 @@ class Spider2Notifier extends StateNotifier<SpiderState> {
           if (isPlayerColliding(playerX, spider)) {
             // followPlayer(spider);
             return spider.copyWith(
-              currentState: SpiderStates.walk,
+              currentState: spider.currentState == SpiderStates.die
+                  ? SpiderStates.die
+                  : SpiderStates.walk,
               currentDirection: Directions.left,
             );
           }
@@ -87,6 +107,14 @@ class Spider2Notifier extends StateNotifier<SpiderState> {
         spiders: state.spiders.map((spider) {
       if (spider.currentState == SpiderStates.attack) {
         final newHealth = spider.health - damage;
+
+        if (newHealth <= 0) {
+          Future.delayed(const Duration(seconds: 2), () {
+            addSpider(
+                initialPosition: spider.initialPosition +
+                    (300 + Random().nextDouble() * (500 - 300)));
+          });
+        }
 
         return spider.copyWith(
           health: newHealth,
