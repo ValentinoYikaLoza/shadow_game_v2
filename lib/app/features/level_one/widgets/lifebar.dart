@@ -12,23 +12,23 @@ class Lifebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50,
-      width: 20 * totalHearts,
+      height: 16.5,
+      width: 22.5 * totalHearts,
       child: Stack(
         children: List.generate(totalHearts.toInt(), (index) {
           double offset =
-              index * 18.0; // Desplazamiento para que se superpongan
+              index * 22.5; // Desplazamiento para que se superpongan
 
           Widget heart = (index < fullHearts)
               ? SizedBox(
-                  width: 40,
+                  width: 19.5,
                   child: Image.asset(
                     'assets/icons/life.png',
                     fit: BoxFit.cover,
                   ),
                 )
               : SizedBox(
-                  width: 40,
+                  width: 19.5,
                   child: ColorFiltered(
                     colorFilter: const ColorFilter.mode(
                       Colors.grey,

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 
 class Gestures extends ConsumerStatefulWidget {
   final Widget child;
@@ -20,7 +19,7 @@ class GesturesState extends ConsumerState<Gestures> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context);
-    final spiderState = ref.watch(spider2Provider);
+    final spiderState = ref.watch(spiderProvider);
 
     return Stack(
       children: [

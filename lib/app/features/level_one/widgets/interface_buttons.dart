@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/custom_button.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/lifebar.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/skills_dialog.dart';
@@ -36,9 +37,37 @@ class InterfaceButtons extends ConsumerWidget {
                 decoration: TextDecoration.none),
           ),
         ),
+        // coins
+        const Positioned(
+          top: 50,
+          right: 20,
+          child: Row(
+            children: [
+              Text(
+                '100',
+                style: TextStyle(
+                  fontSize: 26,
+                  color: AppColors.golden,
+                  fontWeight: FontWeight.w900,
+                  height: 28 / 26,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              SizedBox(width: 10),
+              CustomAnimatedSpriteWidget(
+                spritePath: 'sheets/icons/coin.png',
+                width: 28,
+                frameWidth: 19,
+                frameHeight: 19,
+                frameCount: 10,
+                stepTime: 0.1,
+              ),
+            ],
+          ),
+        ),
         // players life
         Positioned(
-          top: 10,
+          top: 25,
           right: 20,
           child: Lifebar(
             totalHearts: playerState.maxHealth,

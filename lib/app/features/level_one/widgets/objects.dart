@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/chest_widget.dart';
 
 class Objects extends ConsumerWidget {
   final Widget child;
@@ -37,16 +38,12 @@ class Objects extends ConsumerWidget {
           ),
         ),
         // Cofre
-        Positioned(
-          bottom: 85,
-          left: chestState.initialPosition,
-          child: SizedBox(
-            width: 60,
-            child: Image.asset(
-              chestState.currentState.image,
-              fit: BoxFit.cover,
-            ),
-          ),
+        ...List.generate(
+          chestState.chests.length,
+          (index) {
+            final chest = chestState.chests[index];
+            return ChestWidget(chest: chest);
+          },
         ),
       ],
     );
