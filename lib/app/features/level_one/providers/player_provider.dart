@@ -1,13 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 
 final playerProvider =
@@ -112,11 +109,11 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
-      // ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
     checkCollisionsFirstDoor();
-    checkCollisionsFirstChest();
+    checkCollisionsChests();
     checkCollisionsSpiders();
   }
 
@@ -148,12 +145,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
-      // ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
 
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
     checkCollisionsFirstDoor();
-    checkCollisionsFirstChest();
+    checkCollisionsChests();
     checkCollisionsSpiders();
   }
 
@@ -165,7 +162,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       );
     }
     checkCollisionsFirstDoor();
-    checkCollisionsFirstChest();
+    checkCollisionsChests();
     checkCollisionsSpiders();
   }
 
@@ -180,20 +177,13 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     }
   }
 
-  void checkCollisionsFirstChest() {
-    final isColliding =
-        ref.read(chestProvider.notifier).isPlayerColliding(state.positionX);
-
-    if (isColliding) {
-      ref.read(chestProvider.notifier).openChest();
-    } else {
-      ref.read(chestProvider.notifier).closeChest();
-    }
+  void checkCollisionsChests() {
+    ref.read(chestProvider.notifier).isAnyChestNear(state.positionX);
   }
 
   void checkCollisionsSpiders() {
-    ref.read(spider2Provider.notifier).isAnySpiderNear(state.positionX);
-    final spidersIndex = ref.read(spider2Provider);
+    ref.read(spiderProvider.notifier).isAnySpiderNear(state.positionX);
+    final spidersIndex = ref.read(spiderProvider);
 
     if (spidersIndex.spiders
         .where(
@@ -243,7 +233,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       currentState: PlayerStates.attack,
     );
 
-    ref.read(spider2Provider.notifier).takeDamage(state.attackDamage);
+    ref.read(spiderProvider.notifier).takeDamage(state.attackDamage);
 
     ref.read(dogProvider.notifier).changeState(ShadowStates.bark);
   }

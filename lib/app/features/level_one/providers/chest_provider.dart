@@ -10,30 +10,28 @@ class ChestNotifier extends StateNotifier<ChestState> {
   ChestNotifier(this.ref) : super(ChestState());
   final Ref ref;
 
+  void addChest({double initialPosition = 600}) {
+    print('cofre en x:$initialPosition');
+    state = state.copyWith(
+      chests: [...state.chests, Chest(initialPosition: initialPosition)],
+    );
+  }
+
   void updateXCoords(double distanciaRecorrida) {
-    final newPosition = state.initialPosition + distanciaRecorrida;
     state = state.copyWith(
-      initialPosition: newPosition.roundToDouble(),
-    );
-    // print(state.initialPosition);
+        chests: state.chests.map((chest) {
+      final newPosition = chest.initialPosition + distanciaRecorrida;
+
+      return chest.copyWith(
+        initialPosition: newPosition.roundToDouble(),
+      );
+    }).toList());
   }
 
-  void openChest() {
-    state = state.copyWith(
-      currentState: ChestStates.open,
-    );
-  }
-
-  void closeChest() {
-    state = state.copyWith(
-      currentState: ChestStates.close,
-    );
-  }
-
-  bool isPlayerColliding(double playerX) {
+  bool isPlayerColliding(double playerX, Chest chest) {
     // Define el área de colisión del objeto
-    final objectLeft = state.initialPosition - (state.width / 2);
-    final objectRight = state.initialPosition + (state.width / 2);
+    final objectLeft = chest.initialPosition - (chest.width / 2);
+    final objectRight = chest.initialPosition + (chest.width / 2);
 
     // Define el área de colisión del jugador
     // Asumimos que el jugador tiene un área de colisión más pequeña que su sprite
@@ -47,25 +45,56 @@ class ChestNotifier extends StateNotifier<ChestState> {
 
     return colisionHorizontal;
   }
+
+  void isAnyChestNear(double playerX) {
+    state = state.copyWith(
+      chests: state.chests.map(
+        (chest) {
+          if (isPlayerColliding(playerX, chest)) {
+            // followPlayer(spider);
+            return chest.copyWith(
+              currentState: ChestStates.open,
+            );
+          }
+          return chest;
+        },
+      ).toList(),
+    );
+  }
 }
 
 class ChestState {
+  final List<Chest> chests;
+
+  ChestState({
+    this.chests = const [],
+  });
+
+  ChestState copyWith({
+    List<Chest>? chests,
+  }) {
+    return ChestState(
+      chests: chests ?? this.chests,
+    );
+  }
+}
+
+class Chest {
   final double initialPosition;
   final ChestStates currentState;
   final double width;
-
-  ChestState({
+  Chest({
     this.initialPosition = 600,
     this.currentState = ChestStates.close,
     this.width = 60,
   });
 
-  ChestState copyWith({
+  Chest copyWith({
     double? initialPosition,
     ChestStates? currentState,
     double? width,
   }) {
-    return ChestState(
+    return Chest(
       initialPosition: initialPosition ?? this.initialPosition,
       currentState: currentState ?? this.currentState,
       width: width ?? this.width,

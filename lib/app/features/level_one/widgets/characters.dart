@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/lifebar.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/spider.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/spider_widget.dart';
 
 class Characters extends ConsumerStatefulWidget {
   final Widget child;
@@ -25,7 +23,7 @@ class CharactersState extends ConsumerState<Characters> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.read(spider2Provider.notifier).addSpider();
+      ref.read(spiderProvider.notifier).addSpider();
     });
   }
 
@@ -33,7 +31,7 @@ class CharactersState extends ConsumerState<Characters> {
   Widget build(BuildContext context) {
     final playerState = ref.watch(playerProvider);
     final dogState = ref.watch(dogProvider);
-    final spiderState = ref.watch(spider2Provider);
+    final spiderState = ref.watch(spiderProvider);
     return Stack(
       children: [
         widget.child,
@@ -42,7 +40,10 @@ class CharactersState extends ConsumerState<Characters> {
           spiderState.spiders.length,
           (index) {
             final spider = spiderState.spiders[index];
-            return SpiderWidget(spider: spider);
+            return SpiderWidget(
+              spider: spider,
+              isBoss: index == 9,
+            );
           },
         ),
         // Perro

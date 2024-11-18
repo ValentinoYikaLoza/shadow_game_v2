@@ -1,82 +1,59 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
-// final spiderProvider =
-//     StateNotifierProvider<SpiderNotifier, SpiderState>((ref) {
-//   return SpiderNotifier(ref);
-// });
+final spiderProvider =
+    StateNotifierProvider<SpiderNotifier, SpiderState>((ref) {
+  return SpiderNotifier(ref);
+});
 
 class SpiderNotifier extends StateNotifier<SpiderState> {
-  SpiderNotifier(this.ref) : super(SpiderState()) {
-    // Escuchar los cambios del jugador para actualizar la posición y dirección del perro
-    ref.listen(playerProvider, (previous, next) {
-      followPlayer(next);
-    });
-  }
+  SpiderNotifier(this.ref) : super(SpiderState());
+
   final Ref ref;
-  double? previousPositionX;
+  Timer? moveTimer;
+  Timer? disapearTimer;
+
+  void addSpider({double initialPosition = 500}) {
+    state = state.copyWith(
+      spiders: state.spiders.length <= 9
+          ? [
+              ...state.spiders,
+              Spider(
+                initialPosition: initialPosition,
+                attackDamage: state.spiders.length == 9 ? 3 : 1,
+                health: state.spiders.length == 9 ? 10 : 5,
+                maxHealth: state.spiders.length == 9 ? 10 : 5,
+              )
+            ]
+          : state.spiders,
+    );
+    print('araña ${state.spiders.length} x:$initialPosition');
+    startMoving();
+  }
+
+  // void killSpider(Spider spider) {
+  //   state.spiders.remove(spider);
+  // }
 
   void updateXCoords(double distanciaRecorrida) {
-    final newPosition = state.initialPosition + distanciaRecorrida;
     state = state.copyWith(
-      initialPosition: newPosition.roundToDouble(),
-    );
-  }
+        spiders: state.spiders.map((spider) {
+      final newPosition = spider.initialPosition + distanciaRecorrida;
 
-  void followPlayer(PlayerState playerState) {
-    // Definimos la distancia a mantener detrás del jugador
-    const double followDistance = 100.0;
-
-    // Actualizar la posición y dirección del perro para que siga al jugador
-    if (playerState.positionX < state.initialPosition - followDistance &&
-        isPlayerColliding(playerState.positionX)) {
-      // Si el jugador está a la izquierda y la araña está demasiado lejos       
-      state = state.copyWith(
-        initialPosition: playerState.positionX + followDistance,
-        currentState: SpiderStates.walk,
-        currentDirection: Directions.left,
+      return spider.copyWith(
+        initialPosition: newPosition.roundToDouble(),
       );
-    } else if (playerState.positionX > state.initialPosition + followDistance &&
-        isPlayerColliding(playerState.positionX)) {
-      // Si el jugador está a la derecha y el perro está demasiado lejos
-      state = state.copyWith(
-        initialPosition: playerState.positionX - followDistance,
-        currentState: SpiderStates.walk,
-        currentDirection: Directions.right,
-      );
-    } else {
-      // ataca
-      if (!isPlayerColliding(playerState.positionX)) {
-        state = state.copyWith(
-          currentState: SpiderStates.stay,
-          currentDirection: playerState.positionX < state.initialPosition
-              ? Directions.left
-              : Directions.right,
-        );
-      } else {
-        state = state.copyWith(
-          currentState:
-              state.health <= 0 ? SpiderStates.die : SpiderStates.attack,
-          currentDirection: playerState.positionX < state.initialPosition
-              ? Directions.left
-              : Directions.right,
-        );
-      }
-    }
+    }).toList());
   }
 
-  void changeState(SpiderStates newState) {
-    state = state.copyWith(
-      currentState: newState,
-    );
-  }
-
-  bool isPlayerColliding(double playerX) {
+  bool isPlayerColliding(double playerX, Spider spider) {
     // Define el área de colisión del objeto
-    final objectLeft = state.initialPosition - (state.width / 2);
-    final objectRight = state.initialPosition + (state.width / 2);
+    final objectLeft = spider.initialPosition - (spider.width / 2);
+    final objectRight = spider.initialPosition + (spider.width / 2);
 
     // Define el área de colisión del jugador
     // Asumimos que el jugador tiene un área de colisión más pequeña que su sprite
@@ -91,31 +68,96 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     return colisionHorizontal;
   }
 
+  void startMoving() {
+    moveTimer?.cancel();
+    moveTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      final playerState = ref.read(playerProvider);
+      state = state.copyWith(
+        spiders: state.spiders.map((spider) {
+          if (spider.currentState == SpiderStates.walk) {
+            if (spider.initialPosition < playerState.positionX + 50) {
+              return spider.copyWith(
+                currentState: SpiderStates.attack,
+              );
+            } else {
+              return spider.copyWith(
+                initialPosition: spider.initialPosition - 5,
+              );
+            }
+          }
+          return spider;
+        }).toList(),
+      );
+    });
+  }
+
+  void isAnySpiderNear(double playerX) {
+    state = state.copyWith(
+      spiders: state.spiders.map(
+        (spider) {
+          if (isPlayerColliding(playerX, spider)) {
+            // followPlayer(spider);
+            return spider.copyWith(
+              currentState: spider.currentState == SpiderStates.die
+                  ? SpiderStates.die
+                  : SpiderStates.walk,
+              currentDirection: Directions.left,
+            );
+          }
+          return spider;
+        },
+      ).toList(),
+    );
+  }
+
   void takeDamage(double damage) {
-    final newHealth = state.health - damage;
     state = state.copyWith(
-      health: newHealth,
-    );
-  }
+        spiders: state.spiders.map((spider) {
+      if (spider.currentState == SpiderStates.attack) {
+        final newHealth = spider.health - damage;
 
-  //verificar porque el state.copywith no funciona
-  void die() {
-    state = state.copyWith(
-      currentState: SpiderStates.die,
-    );
-  }
+        if (newHealth <= 0) {
+          Future.delayed(const Duration(seconds: 2), () {
+            if (state.spiders.indexOf(spider) == 9) {
+              ref
+                  .read(chestProvider.notifier)
+                  .addChest(initialPosition: spider.initialPosition + 50);
+            }
+            addSpider(
+                initialPosition: spider.initialPosition +
+                    (spider.initialPosition +
+                        Random().nextDouble() *
+                            (1500 - spider.initialPosition)));
+          });
+        }
 
-  //verificar si este funciona
-  void attackPlayer() {
-    state = state.copyWith(
-      currentState: SpiderStates.attack,
-    );
-
-    ref.read(playerProvider.notifier).takeDamage(state.attackDamage);
+        return spider.copyWith(
+          health: newHealth,
+          currentState: newHealth <= 0 ? SpiderStates.die : SpiderStates.attack,
+        );
+      }
+      return spider;
+    }).toList());
   }
 }
 
 class SpiderState {
+  final List<Spider> spiders;
+
+  SpiderState({
+    this.spiders = const [],
+  });
+
+  SpiderState copyWith({
+    List<Spider>? spiders,
+  }) {
+    return SpiderState(
+      spiders: spiders ?? this.spiders,
+    );
+  }
+}
+
+class Spider {
   final double initialPosition;
   final SpiderStates currentState;
   final Directions currentDirection;
@@ -124,17 +166,17 @@ class SpiderState {
   final double maxHealth;
   final double attackDamage;
 
-  SpiderState({
+  Spider({
     this.initialPosition = 500,
     this.currentState = SpiderStates.stay,
     this.currentDirection = Directions.left,
-    this.width = 200,
+    this.width = 300,
     this.health = 5,
     this.maxHealth = 5,
     this.attackDamage = 1,
   });
 
-  SpiderState copyWith({
+  Spider copyWith({
     double? initialPosition,
     SpiderStates? currentState,
     Directions? currentDirection,
@@ -143,7 +185,7 @@ class SpiderState {
     double? maxHealth,
     double? attackDamage,
   }) {
-    return SpiderState(
+    return Spider(
       initialPosition: initialPosition ?? this.initialPosition,
       currentState: currentState ?? this.currentState,
       currentDirection: currentDirection ?? this.currentDirection,

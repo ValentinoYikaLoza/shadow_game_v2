@@ -4,14 +4,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/spider2_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
 
 class SpiderWidget extends ConsumerStatefulWidget {
   final Spider spider;
+  final bool isBoss;
   const SpiderWidget({
     super.key,
     required this.spider,
+    this.isBoss = false,
   });
 
   @override
@@ -77,32 +79,27 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
             ref.read(playerProvider.notifier).changeState(PlayerStates.stay);
           });
         },
-        child: Column(
-          children: [
-            Opacity(
-              opacity: opacity,
-              child: CustomAnimatedSpriteWidget(
-                spritePath: widget.spider.currentState.sheet,
-                width: 95,
-                frameWidth: 95,
-                frameHeight: 77,
-                frameCount: widget.spider.currentState.frames,
-                stepTime: widget.spider.currentState.fps,
-                loop: widget.spider.currentState.loop,
-                flipHorizontally:
-                    widget.spider.currentDirection != Directions.left,
-                onLastFrame: () {
-                  if (widget.spider.currentState == SpiderStates.attack) {
-                    setState(() {
-                      ref
-                          .read(playerProvider.notifier)
-                          .takeDamage(widget.spider.attackDamage);
-                    });
-                  }
-                },
-              ),
-            ),
-          ],
+        child: Opacity(
+          opacity: opacity,
+          child: CustomAnimatedSpriteWidget(
+            spritePath: widget.spider.currentState.sheet,
+            width: widget.isBoss ? 475 : 95,
+            frameWidth: 95,
+            frameHeight: 77,
+            frameCount: widget.spider.currentState.frames,
+            stepTime: widget.spider.currentState.fps,
+            loop: widget.spider.currentState.loop,
+            flipHorizontally: widget.spider.currentDirection != Directions.left,
+            onLastFrame: () {
+              if (widget.spider.currentState == SpiderStates.attack) {
+                setState(() {
+                  ref
+                      .read(playerProvider.notifier)
+                      .takeDamage(widget.spider.attackDamage);
+                });
+              }
+            },
+          ),
         ),
       ),
     );
