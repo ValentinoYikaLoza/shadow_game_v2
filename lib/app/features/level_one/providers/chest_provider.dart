@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/coin_provider.dart';
 
 final chestProvider = StateNotifierProvider<ChestNotifier, ChestState>((ref) {
   return ChestNotifier(ref);
@@ -15,6 +16,8 @@ class ChestNotifier extends StateNotifier<ChestState> {
     state = state.copyWith(
       chests: [...state.chests, Chest(initialPosition: initialPosition)],
     );
+
+    ref.read(coinProvider.notifier).addCoin();
   }
 
   void updateXCoords(double distanciaRecorrida) {
@@ -50,8 +53,9 @@ class ChestNotifier extends StateNotifier<ChestState> {
     state = state.copyWith(
       chests: state.chests.map(
         (chest) {
-          if (isPlayerColliding(playerX, chest)) {
-            // followPlayer(spider);
+          if (isPlayerColliding(playerX, chest) &&
+              chest.currentState != ChestStates.open) {
+            print('cofre N ${state.chests.indexOf(chest)}');
             return chest.copyWith(
               currentState: ChestStates.open,
             );

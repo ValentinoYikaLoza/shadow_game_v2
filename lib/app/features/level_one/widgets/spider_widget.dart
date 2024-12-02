@@ -59,7 +59,11 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 80,
+      bottom: widget.isBoss
+          ? widget.spider.currentState == SpiderStates.die
+              ? 20
+              : 35
+          : 75,
       left: widget.spider.initialPosition,
       child: GestureDetector(
         onLongPressDown: (_) {

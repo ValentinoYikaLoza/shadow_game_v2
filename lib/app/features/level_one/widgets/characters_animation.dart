@@ -8,6 +8,7 @@ class CustomGif extends StatefulWidget {
   final bool flip;
   final double speed;
   final VoidCallback? onComplete;
+  final Key? controller;
 
   const CustomGif({
     super.key,
@@ -17,6 +18,7 @@ class CustomGif extends StatefulWidget {
     this.flip = false,
     this.speed = 0.1,
     this.onComplete,
+    this.controller,
   });
 
   @override
@@ -60,7 +62,7 @@ class CustomGifState extends State<CustomGif> {
               } else {
                 _timer?.cancel();
               }
-              
+
               if (widget.onComplete != null) {
                 widget.onComplete!();
               }
@@ -96,6 +98,7 @@ class CustomGifState extends State<CustomGif> {
         alignment: Alignment.center,
         // Add caching to prevent flickering
         gaplessPlayback: true,
+        key: widget.controller,
       ),
     );
   }

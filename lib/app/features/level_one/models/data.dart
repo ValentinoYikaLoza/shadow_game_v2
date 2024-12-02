@@ -158,7 +158,7 @@ enum SpiderStates {
 }
 
 enum CoinStates {
-  showing([
+  looping([
     'assets/frames/objects/coin/frame_0.png',
     'assets/frames/objects/coin/frame_1.png',
     'assets/frames/objects/coin/frame_2.png',
@@ -170,7 +170,7 @@ enum CoinStates {
     'assets/frames/objects/coin/frame_8.png',
     'assets/frames/objects/coin/frame_9.png',
   ], 10, true, 0.1),
-  hidden([
+  waiting([
     'assets/frames/objects/coin/frame_0.png',
     'assets/frames/objects/coin/frame_1.png',
     'assets/frames/objects/coin/frame_2.png',
@@ -197,19 +197,19 @@ enum CoinStates {
 }
 
 enum DoorStates {
-  open('assets/images/level_one/door/open_door.png'),
-  close('assets/images/level_one/door/close_door.png');
+  open(['assets/images/level_one/door/open_door.png']),
+  close(['assets/images/level_one/door/close_door.png']);
 
-  final String image;
-  const DoorStates(this.image);
+  final List<String> images;
+  const DoorStates(this.images);
 }
 
 enum ChestStates {
-  open('assets/images/level_one/chest/open_chest.png'),
-  close('assets/images/level_one/chest/close_chest.png');
+  open(['assets/images/level_one/chest/open_chest.png']),
+  close(['assets/images/level_one/chest/close_chest.png']);
 
-  final String image;
-  const ChestStates(this.image);
+  final List<String> images;
+  const ChestStates(this.images);
 }
 
 enum Directions {

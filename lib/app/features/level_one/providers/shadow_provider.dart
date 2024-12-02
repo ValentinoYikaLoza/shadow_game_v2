@@ -83,7 +83,7 @@ class DogState {
 
   DogState({
     this.positionX = 45,
-    this.positionY = 86,
+    this.positionY = 75,
     this.isEnemyNear = false,
     this.currentState = ShadowStates.sit,
     this.currentDirection = Directions.left,
