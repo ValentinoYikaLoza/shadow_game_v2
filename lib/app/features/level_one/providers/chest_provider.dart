@@ -11,7 +11,7 @@ class ChestNotifier extends StateNotifier<ChestState> {
   final Ref ref;
 
   void addChest({double initialPosition = 600}) {
-    print('cofre en x:$initialPosition');
+    // print('cofre en x:$initialPosition');
     state = state.copyWith(
       chests: [...state.chests, Chest(initialPosition: initialPosition)],
     );

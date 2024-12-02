@@ -1,18 +1,54 @@
 // cada animacion debe venir con su propia velocidad y estado de bucle,
 // agregar eso como parámtros
 enum PlayerStates {
-  stay('sheets/player/stay.png', 4, true, 0.2),
-  walk('sheets/player/walk.png', 8, true, 0.1),
-  attack('sheets/player/attack.png', 4, false, 0.05),
-  dance('sheets/player/dance.png', 10, true, 0.2),
-  jump('sheets/player/jump.png', 5, true, 0.1);
+  stay([
+    'assets/frames/player/stay/frame_0.png',
+    'assets/frames/player/stay/frame_1.png',
+    'assets/frames/player/stay/frame_2.png',
+    'assets/frames/player/stay/frame_3.png',
+  ], 4, true, 0.2),
+  walk([
+    'assets/frames/player/walk/frame_0.png',
+    'assets/frames/player/walk/frame_1.png',
+    'assets/frames/player/walk/frame_2.png',
+    'assets/frames/player/walk/frame_3.png',
+    'assets/frames/player/walk/frame_4.png',
+    'assets/frames/player/walk/frame_5.png',
+    'assets/frames/player/walk/frame_6.png',
+    'assets/frames/player/walk/frame_7.png',
+  ], 8, true, 0.1),
+  attack([
+    'assets/frames/player/attack/frame_0.png',
+    'assets/frames/player/attack/frame_1.png',
+    'assets/frames/player/attack/frame_2.png',
+    'assets/frames/player/attack/frame_3.png',
+  ], 4, false, 0.05),
+  dance([
+    'assets/frames/player/dance/frame_0.png',
+    'assets/frames/player/dance/frame_1.png',
+    'assets/frames/player/dance/frame_2.png',
+    'assets/frames/player/dance/frame_3.png',
+    'assets/frames/player/dance/frame_4.png',
+    'assets/frames/player/dance/frame_5.png',
+    'assets/frames/player/dance/frame_6.png',
+    'assets/frames/player/dance/frame_7.png',
+    'assets/frames/player/dance/frame_8.png',
+    'assets/frames/player/dance/frame_9.png',
+  ], 10, true, 0.2),
+  jump([
+    'assets/frames/player/jump/frame_0.png',
+    'assets/frames/player/jump/frame_1.png',
+    'assets/frames/player/jump/frame_2.png',
+    'assets/frames/player/jump/frame_3.png',
+    'assets/frames/player/jump/frame_4.png',
+  ], 5, true, 0.1);
 
-  final String sheet;
+  final List<String> images;
   final int frames;
   final bool loop;
   final double fps;
   const PlayerStates(
-    this.sheet,
+    this.images,
     this.frames,
     this.loop,
     this.fps,
@@ -20,16 +56,37 @@ enum PlayerStates {
 }
 
 enum ShadowStates {
-  sit('sheets/shadow/sit.png', 6, true, 0.2),
-  walk('sheets/shadow/walk.png', 4, true, 0.15),
-  bark('sheets/shadow/bark.png', 8, true, 0.1);
+  sit([
+    'assets/frames/shadow/sit/frame_0.png',
+    'assets/frames/shadow/sit/frame_1.png',
+    'assets/frames/shadow/sit/frame_2.png',
+    'assets/frames/shadow/sit/frame_3.png',
+    'assets/frames/shadow/sit/frame_4.png',
+    'assets/frames/shadow/sit/frame_5.png',
+  ], 6, true, 0.2),
+  walk([
+    'assets/frames/shadow/walk/frame_0.png',
+    'assets/frames/shadow/walk/frame_1.png',
+    'assets/frames/shadow/walk/frame_2.png',
+    'assets/frames/shadow/walk/frame_3.png',
+  ], 4, true, 0.15),
+  bark([
+    'assets/frames/shadow/bark/frame_0.png',
+    'assets/frames/shadow/bark/frame_1.png',
+    'assets/frames/shadow/bark/frame_2.png',
+    'assets/frames/shadow/bark/frame_3.png',
+    'assets/frames/shadow/bark/frame_4.png',
+    'assets/frames/shadow/bark/frame_5.png',
+    'assets/frames/shadow/bark/frame_6.png',
+    'assets/frames/shadow/bark/frame_7.png',
+  ], 8, true, 0.1);
 
-  final String sheet;
+  final List<String> images;
   final int frames;
   final bool loop;
   final double fps;
   const ShadowStates(
-    this.sheet,
+    this.images,
     this.frames,
     this.loop,
     this.fps,
@@ -37,17 +94,102 @@ enum ShadowStates {
 }
 
 enum SpiderStates {
-  stay('sheets/spider/stay.png', 5, true, 0.1),
-  walk('sheets/spider/walk.png', 4, true, 0.1),
-  attack('sheets/spider/attack.png', 16, true, 0.08),
-  die('sheets/spider/die.png', 17, false, 0.05);
+  stay([
+    'assets/frames/spider/stay/frame_0.png',
+    'assets/frames/spider/stay/frame_1.png',
+    'assets/frames/spider/stay/frame_2.png',
+    'assets/frames/spider/stay/frame_3.png',
+    'assets/frames/spider/stay/frame_4.png',
+  ], 5, true, 0.1),
+  walk([
+    'assets/frames/spider/walk/frame_0.png',
+    'assets/frames/spider/walk/frame_1.png',
+    'assets/frames/spider/walk/frame_2.png',
+    'assets/frames/spider/walk/frame_3.png',
+  ], 4, true, 0.2),
+  attack([
+    'assets/frames/spider/attack/frame_00.png',
+    'assets/frames/spider/attack/frame_01.png',
+    'assets/frames/spider/attack/frame_02.png',
+    'assets/frames/spider/attack/frame_03.png',
+    'assets/frames/spider/attack/frame_04.png',
+    'assets/frames/spider/attack/frame_05.png',
+    'assets/frames/spider/attack/frame_06.png',
+    'assets/frames/spider/attack/frame_07.png',
+    'assets/frames/spider/attack/frame_08.png',
+    'assets/frames/spider/attack/frame_09.png',
+    'assets/frames/spider/attack/frame_10.png',
+    'assets/frames/spider/attack/frame_11.png',
+    'assets/frames/spider/attack/frame_12.png',
+    'assets/frames/spider/attack/frame_13.png',
+    'assets/frames/spider/attack/frame_14.png',
+    'assets/frames/spider/attack/frame_15.png',
+  ], 16, true, 0.08),
+  die([
+    'assets/frames/spider/die/frame_00.png',
+    'assets/frames/spider/die/frame_01.png',
+    'assets/frames/spider/die/frame_02.png',
+    'assets/frames/spider/die/frame_03.png',
+    'assets/frames/spider/die/frame_04.png',
+    'assets/frames/spider/die/frame_05.png',
+    'assets/frames/spider/die/frame_06.png',
+    'assets/frames/spider/die/frame_07.png',
+    'assets/frames/spider/die/frame_08.png',
+    'assets/frames/spider/die/frame_09.png',
+    'assets/frames/spider/die/frame_10.png',
+    'assets/frames/spider/die/frame_11.png',
+    'assets/frames/spider/die/frame_12.png',
+    'assets/frames/spider/die/frame_13.png',
+    'assets/frames/spider/die/frame_14.png',
+    'assets/frames/spider/die/frame_15.png',
+    'assets/frames/spider/die/frame_16.png',
+  ], 17, false, 0.05);
 
-  final String sheet;
+  final List<String> images;
   final int frames;
   final bool loop;
   final double fps;
   const SpiderStates(
-    this.sheet,
+    this.images,
+    this.frames,
+    this.loop,
+    this.fps,
+  );
+}
+
+enum CoinStates {
+  showing([
+    'assets/frames/objects/coin/frame_0.png',
+    'assets/frames/objects/coin/frame_1.png',
+    'assets/frames/objects/coin/frame_2.png',
+    'assets/frames/objects/coin/frame_3.png',
+    'assets/frames/objects/coin/frame_4.png',
+    'assets/frames/objects/coin/frame_5.png',
+    'assets/frames/objects/coin/frame_6.png',
+    'assets/frames/objects/coin/frame_7.png',
+    'assets/frames/objects/coin/frame_8.png',
+    'assets/frames/objects/coin/frame_9.png',
+  ], 10, true, 0.1),
+  hidden([
+    'assets/frames/objects/coin/frame_0.png',
+    'assets/frames/objects/coin/frame_1.png',
+    'assets/frames/objects/coin/frame_2.png',
+    'assets/frames/objects/coin/frame_3.png',
+    'assets/frames/objects/coin/frame_4.png',
+    'assets/frames/objects/coin/frame_5.png',
+    'assets/frames/objects/coin/frame_6.png',
+    'assets/frames/objects/coin/frame_7.png',
+    'assets/frames/objects/coin/frame_8.png',
+    'assets/frames/objects/coin/frame_9.png',
+  ], 10, false, 0.1);
+
+  final List<String> images;
+  final int frames;
+  final bool loop;
+  final double fps;
+
+  const CoinStates(
+    this.images,
     this.frames,
     this.loop,
     this.fps,

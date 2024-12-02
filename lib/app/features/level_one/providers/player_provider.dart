@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/coin_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
@@ -21,7 +22,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   Timer? _inactivityTimer;
 
   // Duración de tiempo para considerar inactividad
-  static const inactivityDuration = Duration(minutes: 5);
+  static const inactivityDuration = Duration(seconds: 5);
 
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
@@ -92,6 +93,13 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     resetInactivityTimer();
     final distanciaRecorrida = state.moveAmount * state.playerSpeed;
 
+    // // Verificar si se puede mover a la derecha
+    // if (!ref
+    //     .read(backgroundProvider.notifier)
+    //     .canMoveRight(distanciaRecorrida)) {
+    //   return; // Si no se puede mover, salimos de la función
+    // }
+
     if (state.positionX < rightBoundary / 1.5) {
       // Si no ha llegado al límite derecho, movemos al jugador
       state = state.copyWith(
@@ -108,11 +116,13 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(coinProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
-    checkCollisionsFirstDoor();
+    checkCollisionsDoors();
+    checkCollisionsCoins();
     checkCollisionsChests();
     checkCollisionsSpiders();
   }
@@ -144,12 +154,14 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
       ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
+      ref.read(coinProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
 
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
-    checkCollisionsFirstDoor();
+    checkCollisionsDoors();
+    checkCollisionsCoins();
     checkCollisionsChests();
     checkCollisionsSpiders();
   }
@@ -161,20 +173,18 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         currentState: PlayerStates.stay,
       );
     }
-    checkCollisionsFirstDoor();
+    checkCollisionsDoors();
+    checkCollisionsCoins();
     checkCollisionsChests();
     checkCollisionsSpiders();
   }
 
-  void checkCollisionsFirstDoor() {
-    final isColliding =
-        ref.read(doorProvider.notifier).isPlayerColliding(state.positionX);
+  void checkCollisionsDoors() {
+    ref.read(doorProvider.notifier).isAnyDoorNear(state.positionX);
+  }
 
-    if (isColliding) {
-      ref.read(doorProvider.notifier).openDoor();
-    } else {
-      ref.read(doorProvider.notifier).closeDoor();
-    }
+  void checkCollisionsCoins() {
+    ref.read(coinProvider.notifier).isAnyCoinNear(state.positionX);
   }
 
   void checkCollisionsChests() {
@@ -199,7 +209,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
         moveAmount: 0,
         playerSpeed: 0,
       );
-      ref.read(dogProvider.notifier).help();
+      // ref.read(dogProvider.notifier).help();
     } else {
       state = state.copyWith(
         moveAmount: 10,
@@ -218,11 +228,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     state = state.copyWith(
       health: state.health - damage,
     );
-    if (state.health > 0) {
-      print('jugador: ${state.health}');
-    } else {
-      print('jugador: muelto');
-    }
+  }
+
+  void getCoin(double amount) {
+    state = state.copyWith(
+      coins: state.coins + amount,
+    );
   }
 
   void die() {}
@@ -250,6 +261,7 @@ class PlayerState {
   final double moveAmount;
   final double playerSpeed;
   final double health;
+  final double coins;
   final double maxHealth;
   final double attackDamage;
 
@@ -264,6 +276,7 @@ class PlayerState {
     this.moveAmount = 10,
     this.playerSpeed = 0.2,
     this.health = 10,
+    this.coins = 0,
     this.maxHealth = 10,
     this.attackDamage = 2,
   });
@@ -279,6 +292,7 @@ class PlayerState {
     double? moveAmount,
     double? playerSpeed,
     double? health,
+    double? coins,
     double? maxHealth,
     double? attackDamage,
   }) {
@@ -293,6 +307,7 @@ class PlayerState {
       moveAmount: moveAmount ?? this.moveAmount,
       playerSpeed: playerSpeed ?? this.playerSpeed,
       health: health ?? this.health,
+      coins: coins ?? this.coins,
       maxHealth: maxHealth ?? this.maxHealth,
       attackDamage: attackDamage ?? this.attackDamage,
     );

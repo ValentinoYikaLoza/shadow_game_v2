@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
 final spiderProvider =
@@ -19,19 +22,21 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
   void addSpider({double initialPosition = 500}) {
     state = state.copyWith(
-      spiders: state.spiders.length <= 9
+      spiders: state.spiders.length <= state.maxSpiders - 1
           ? [
               ...state.spiders,
               Spider(
                 initialPosition: initialPosition,
-                attackDamage: state.spiders.length == 9 ? 3 : 1,
-                health: state.spiders.length == 9 ? 10 : 5,
-                maxHealth: state.spiders.length == 9 ? 10 : 5,
+                attackDamage:
+                    state.spiders.length == state.maxSpiders - 1 ? 3 : 1,
+                health: state.spiders.length == state.maxSpiders - 1 ? 10 : 5,
+                maxHealth:
+                    state.spiders.length == state.maxSpiders - 1 ? 10 : 5,
               )
             ]
           : state.spiders,
     );
-    print('araña ${state.spiders.length} x:$initialPosition');
+    // print('araña ${state.spiders.length} x:$initialPosition');
     startMoving();
   }
 
@@ -117,18 +122,30 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
         final newHealth = spider.health - damage;
 
         if (newHealth <= 0) {
-          Future.delayed(const Duration(seconds: 2), () {
-            if (state.spiders.indexOf(spider) == 9) {
+          if (state.spiders.indexOf(spider) == state.maxSpiders - 1) {
+            Future.delayed(const Duration(seconds: 2), () {
               ref
                   .read(chestProvider.notifier)
                   .addChest(initialPosition: spider.initialPosition + 50);
-            }
-            addSpider(
-                initialPosition: spider.initialPosition +
-                    (spider.initialPosition +
-                        Random().nextDouble() *
-                            (1500 - spider.initialPosition)));
-          });
+              ref.read(doorProvider.notifier).addDoor(
+                    initialPosition: spider.initialPosition + 150,
+                    doorType: DoorType.finish,
+                  );
+            });
+          }
+
+          if (state.spiders.indexOf(spider) < state.maxSpiders) {
+            Future.delayed(const Duration(seconds: 2), () {
+              ref
+                  .read(chestProvider.notifier)
+                  .addChest(initialPosition: spider.initialPosition + 50);
+              addSpider(
+                  initialPosition: spider.initialPosition +
+                      (spider.initialPosition +
+                          Random().nextDouble() *
+                              (1500 - spider.initialPosition)));
+            });
+          }
         }
 
         return spider.copyWith(
@@ -143,16 +160,20 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
 class SpiderState {
   final List<Spider> spiders;
+  final int maxSpiders;
 
   SpiderState({
     this.spiders = const [],
+    this.maxSpiders = 2,
   });
 
   SpiderState copyWith({
     List<Spider>? spiders,
+    int? maxSpiders,
   }) {
     return SpiderState(
       spiders: spiders ?? this.spiders,
+      maxSpiders: maxSpiders ?? this.maxSpiders,
     );
   }
 }

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/chest_widget.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/door_widget.dart';
 
-class Objects extends ConsumerWidget {
+class Objects extends ConsumerStatefulWidget {
   final Widget child;
   const Objects({
     super.key,
@@ -12,37 +14,43 @@ class Objects extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, ref) {
-    // final screen = MediaQuery.of(context);
+  ObjectsState createState() => ObjectsState();
+}
+
+class ObjectsState extends ConsumerState<Objects> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.read(doorProvider.notifier).addDoor();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final doorState = ref.watch(doorProvider);
     final chestState = ref.watch(chestProvider);
+    final spiderState = ref.watch(spiderProvider);
     return Stack(
       children: [
-        child,
+        widget.child,
         //Puerta
-        Positioned(
-          bottom: 63,
-          left: doorState.initialPosition,
-          child: Column(
-            children: [
-              Image.asset('assets/gifs/home.gif'),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: 100,
-                child: Image.asset(
-                  doorState.currentState.image,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+        ...List.generate(
+          doorState.doors.length,
+          (index) {
+            final door = doorState.doors[index];
+            return DoorWidget(door: door);
+          },
         ),
         // Cofre
         ...List.generate(
           chestState.chests.length,
           (index) {
             final chest = chestState.chests[index];
-            return ChestWidget(chest: chest);
+            return ChestWidget(
+              chest: chest,
+              isBoss: index == spiderState.maxSpiders - 1,
+            );
           },
         ),
       ],

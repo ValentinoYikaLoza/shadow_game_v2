@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
+import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
@@ -38,14 +39,14 @@ class InterfaceButtons extends ConsumerWidget {
           ),
         ),
         // coins
-        const Positioned(
+        Positioned(
           top: 50,
           right: 20,
           child: Row(
             children: [
               Text(
-                '100',
-                style: TextStyle(
+                '${playerState.coins.round()}',
+                style: const TextStyle(
                   fontSize: 26,
                   color: AppColors.golden,
                   fontWeight: FontWeight.w900,
@@ -53,14 +54,11 @@ class InterfaceButtons extends ConsumerWidget {
                   decoration: TextDecoration.none,
                 ),
               ),
-              SizedBox(width: 10),
-              CustomAnimatedSpriteWidget(
-                spritePath: 'sheets/icons/coin.png',
-                width: 28,
-                frameWidth: 19,
-                frameHeight: 19,
-                frameCount: 10,
-                stepTime: 0.1,
+              const SizedBox(width: 10),
+              CustomGif(
+                images: CoinStates.showing.images,
+                width: 26,
+                loop: CoinStates.showing.loop,
               ),
             ],
           ),

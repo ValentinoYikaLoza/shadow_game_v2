@@ -81,16 +81,12 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
         },
         child: Opacity(
           opacity: opacity,
-          child: CustomAnimatedSpriteWidget(
-            spritePath: widget.spider.currentState.sheet,
+          child: CustomGif(
+            images: widget.spider.currentState.images,
             width: widget.isBoss ? 475 : 95,
-            frameWidth: 95,
-            frameHeight: 77,
-            frameCount: widget.spider.currentState.frames,
-            stepTime: widget.spider.currentState.fps,
             loop: widget.spider.currentState.loop,
-            flipHorizontally: widget.spider.currentDirection != Directions.left,
-            onLastFrame: () {
+            flip: widget.spider.currentDirection != Directions.left,
+            onComplete: () {
               if (widget.spider.currentState == SpiderStates.attack) {
                 setState(() {
                   ref

@@ -42,7 +42,7 @@ class CharactersState extends ConsumerState<Characters> {
             final spider = spiderState.spiders[index];
             return SpiderWidget(
               spider: spider,
-              isBoss: index == 9,
+              isBoss: index == spiderState.maxSpiders - 1,
             );
           },
         ),
@@ -66,15 +66,11 @@ class CharactersState extends ConsumerState<Characters> {
                 ref.read(dogProvider.notifier).changeState(ShadowStates.sit);
               });
             },
-            child: CustomAnimatedSpriteWidget(
-              spritePath: dogState.currentState.sheet,
+            child: CustomGif(
+              images: dogState.currentState.images,
               width: 80,
-              frameWidth: 100,
-              frameHeight: 72,
-              frameCount: dogState.currentState.frames,
-              stepTime: dogState.currentState.fps,
               loop: dogState.currentState.loop,
-              flipHorizontally: dogState.currentDirection == Directions.left,
+              flip: dogState.currentDirection == Directions.left,
             ),
           ),
         ),
@@ -86,15 +82,11 @@ class CharactersState extends ConsumerState<Characters> {
             onLongPressDown: (_) {
               setState(() {});
             },
-            child: CustomAnimatedSpriteWidget(
-              spritePath: playerState.currentState.sheet,
+            child: CustomGif(
+              images: playerState.currentState.images,
               width: 50,
-              frameWidth: 50,
-              frameHeight: 50,
-              frameCount: playerState.currentState.frames,
-              stepTime: playerState.currentState.fps,
               loop: playerState.currentState.loop,
-              flipHorizontally: playerState.currentDirection == Directions.left,
+              flip: playerState.currentDirection == Directions.left,
             ),
           ),
         ),

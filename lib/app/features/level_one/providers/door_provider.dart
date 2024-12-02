@@ -10,30 +10,35 @@ class DoorNotifier extends StateNotifier<DoorState> {
   DoorNotifier(this.ref) : super(DoorState());
   final Ref ref;
 
+  void addDoor(
+      {double initialPosition = 100, DoorType doorType = DoorType.start}) {
+    // print('cofre en x:$initialPosition');
+    state = state.copyWith(
+      doors: [
+        ...state.doors,
+        Door(
+          initialPosition: initialPosition,
+          doorType: doorType,
+        )
+      ],
+    );
+  }
+
   void updateXCoords(double distanciaRecorrida) {
-    final newPosition = state.initialPosition + distanciaRecorrida;
     state = state.copyWith(
-      initialPosition: newPosition.roundToDouble(),
-    );
-    // print(state.initialPosition);
+        doors: state.doors.map((door) {
+      final newPosition = door.initialPosition + distanciaRecorrida;
+
+      return door.copyWith(
+        initialPosition: newPosition.roundToDouble(),
+      );
+    }).toList());
   }
 
-  void openDoor() {
-    state = state.copyWith(
-      currentState: DoorStates.open,
-    );
-  }
-
-  void closeDoor() {
-    state = state.copyWith(
-      currentState: DoorStates.close,
-    );
-  }
-
-  bool isPlayerColliding(double playerX) {
+  bool isPlayerColliding(double playerX, Door door) {
     // Define el área de colisión del objeto
-    final objectLeft = state.initialPosition - (state.width / 2);
-    final objectRight = state.initialPosition + (state.width / 2);
+    final objectLeft = door.initialPosition - (door.width / 2);
+    final objectRight = door.initialPosition + (door.width / 2);
 
     // Define el área de colisión del jugador
     // Asumimos que el jugador tiene un área de colisión más pequeña que su sprite
@@ -47,28 +52,72 @@ class DoorNotifier extends StateNotifier<DoorState> {
 
     return colisionHorizontal;
   }
+
+  void isAnyDoorNear(double playerX) {
+    state = state.copyWith(
+      doors: state.doors.map(
+        (door) {
+          if (isPlayerColliding(playerX, door)) {
+            // followPlayer(spider);
+            return door.copyWith(
+              currentState: DoorStates.open,
+            );
+          } else {
+            return door.copyWith(
+              currentState: DoorStates.close,
+            );
+          }
+        },
+      ).toList(),
+    );
+  }
 }
 
 class DoorState {
-  final double initialPosition;
-  final DoorStates currentState;
-  final double width;
+  final List<Door> doors;
 
   DoorState({
-    this.initialPosition = 100,
-    this.currentState = DoorStates.close,
-    this.width = 80,
+    this.doors = const [],
   });
 
   DoorState copyWith({
-    double? initialPosition,
-    DoorStates? currentState,
-    double? width,
+    List<Door>? doors,
   }) {
     return DoorState(
+      doors: doors ?? this.doors,
+    );
+  }
+}
+
+class Door {
+  final double initialPosition;
+  final DoorStates currentState;
+  final DoorType doorType;
+  final double width;
+
+  Door({
+    this.initialPosition = 100,
+    this.currentState = DoorStates.close,
+    this.doorType = DoorType.start,
+    this.width = 100,
+  });
+
+  Door copyWith({
+    double? initialPosition,
+    DoorStates? currentState,
+    DoorType? doorType,
+    double? width,
+  }) {
+    return Door(
       initialPosition: initialPosition ?? this.initialPosition,
       currentState: currentState ?? this.currentState,
+      doorType: doorType ?? this.doorType,
       width: width ?? this.width,
     );
   }
+}
+
+enum DoorType {
+  start,
+  finish,
 }

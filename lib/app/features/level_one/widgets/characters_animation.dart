@@ -1,245 +1,102 @@
-import 'package:flame/components.dart';
-import 'package:flame/game.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 
-/// Widget que muestra una animación de sprite personalizada
-/// Maneja la configuración inicial y la presentación del sprite animado
-class CustomAnimatedSpriteWidget extends StatefulWidget {
-  // Ruta al archivo de imagen del spritesheet
-  final String spritePath;
-  // Ancho de cada frame individual en el spritesheet
-  final double frameWidth;
-  // Alto de cada frame individual en el spritesheet
-  final double frameHeight;
-  // Número total de frames en la animación
-  final int frameCount;
-  // Tiempo entre cada frame (en segundos)
-  final double stepTime;
-  // Si la animación debe repetirse
+class CustomGif extends StatefulWidget {
+  final List<String> images;
+  final double width;
   final bool loop;
-  // Ancho opcional para el widget (escala la animación)
-  final double? width;
-  // Si el sprite debe voltearse horizontalmente
-  final bool flipHorizontally;
-  // Función que se ejecutará cuando se llegue al último frame
-  final VoidCallback? onLastFrame;
+  final bool flip;
+  final double speed;
+  final VoidCallback? onComplete;
 
-  const CustomAnimatedSpriteWidget({
+  const CustomGif({
     super.key,
-    required this.spritePath,
-    required this.frameWidth,
-    required this.frameHeight,
-    required this.frameCount,
-    this.stepTime = 0.1,
+    required this.images,
+    this.width = 100.0,
     this.loop = true,
-    this.width,
-    this.flipHorizontally = false,
-    this.onLastFrame,
+    this.flip = false,
+    this.speed = 0.1,
+    this.onComplete,
   });
 
   @override
-  State<CustomAnimatedSpriteWidget> createState() =>
-      _CustomAnimatedSpriteWidgetState();
+  CustomGifState createState() => CustomGifState();
 }
 
-class _CustomAnimatedSpriteWidgetState
-    extends State<CustomAnimatedSpriteWidget> {
-  // Instancia del juego que maneja la animación
-  _CustomAnimatedSpriteGame? _game;
-  // Almacena la ruta actual del sprite para detectar cambios
-  String? _currentSpritePath;
+class CustomGifState extends State<CustomGif> {
+  int _currentFrame = 0;
+  Timer? _timer;
+  List<String> _currentImages = [];
 
   @override
   void initState() {
     super.initState();
-    _createGame();
+    _initializeAnimation();
   }
 
-  /// Se llama cuando las propiedades del widget cambian
-  /// Recrea el juego si cambian propiedades importantes
   @override
-  void didUpdateWidget(CustomAnimatedSpriteWidget oldWidget) {
+  void didUpdateWidget(CustomGif oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.spritePath != oldWidget.spritePath ||
-        widget.frameCount != oldWidget.frameCount ||
-        widget.stepTime != oldWidget.stepTime) {
-      _createGame();
+    // Only reinitialize if images have changed
+    if (oldWidget.images != widget.images) {
+      _timer?.cancel();
+      _currentFrame = 0;
+      _initializeAnimation();
     }
   }
 
-  /// Crea una nueva instancia del juego si la ruta del sprite ha cambiado
-  void _createGame() {
-    if (_currentSpritePath != widget.spritePath) {
-      _currentSpritePath = widget.spritePath;
-      _game = _CustomAnimatedSpriteGame(
-        spritePath: widget.spritePath,
-        frameWidth: widget.frameWidth,
-        frameHeight: widget.frameHeight,
-        frameCount: widget.frameCount,
-        stepTime: widget.stepTime,
-        loop: widget.loop,
-        widgetWidth: widget.width,
-        onLastFrame: widget.onLastFrame,
+  void _initializeAnimation() {
+    _currentImages = widget.images;
+    if (_currentImages.isNotEmpty) {
+      _timer = Timer.periodic(
+        Duration(milliseconds: (widget.speed * 1000).toInt()),
+        (timer) {
+          setState(() {
+            if (_currentFrame + 1 < _currentImages.length) {
+              _currentFrame++;
+            } else {
+              if (widget.loop) {
+                _currentFrame = 0;
+              } else {
+                _timer?.cancel();
+              }
+              
+              if (widget.onComplete != null) {
+                widget.onComplete!();
+              }
+            }
+          });
+        },
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Calcula las dimensiones manteniendo la proporción aspect ratio
-    final aspectRatio = widget.frameHeight / widget.frameWidth;
-    final calculatedHeight =
-        widget.width != null ? widget.width! * aspectRatio : widget.frameHeight;
+    if (_currentImages.isEmpty) {
+      return const Center(child: Text("No images available"));
+    }
 
-    // Construye el widget con transformación opcional para volteo horizontal
+    final imagePath = _currentImages[_currentFrame];
+
     return Transform(
       alignment: Alignment.center,
-      transform: Matrix4.rotationY(widget.flipHorizontally ? 3.14159 : 0),
-      child: SizedBox(
+      transform: Matrix4.rotationY(widget.flip ? 3.14159 : 0),
+      child: Image.asset(
+        imagePath,
         width: widget.width,
-        height: calculatedHeight,
-        child: _game != null ? GameWidget(game: _game!) : Container(),
+        height: widget.width,
+        fit: BoxFit.contain,
+        alignment: Alignment.center,
+        // Add caching to prevent flickering
+        gaplessPlayback: true,
       ),
     );
-  }
-}
-
-/// Clase principal del juego que maneja la lógica de la animación
-class _CustomAnimatedSpriteGame extends FlameGame {
-  final String spritePath;
-  final double frameWidth;
-  final double frameHeight;
-  final int frameCount;
-  final double stepTime;
-  final bool loop;
-  final double? widgetWidth;
-  final VoidCallback? onLastFrame;
-  CustomSpriteAnimationComponent? _animatedComponent;
-  bool _isLoaded = false;
-
-  _CustomAnimatedSpriteGame({
-    required this.spritePath,
-    required this.frameWidth,
-    required this.frameHeight,
-    required this.frameCount,
-    required this.stepTime,
-    required this.loop,
-    this.widgetWidth,
-    this.onLastFrame,
-  });
-
-  // Hace el fondo transparente
-  @override
-  Color backgroundColor() => Colors.transparent;
-
-  /// Se llama cuando el juego se inicializa
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    if (!_isLoaded) {
-      await _loadAnimation();
-      _isLoaded = true;
-    }
-  }
-
-  /// Carga la animación desde el spritesheet
-  Future<void> _loadAnimation() async {
-    try {
-      // Elimina la animación anterior si existe
-      if (_animatedComponent != null) {
-        remove(_animatedComponent!);
-      }
-
-      // Carga el spritesheet
-      final spriteSheet = await images.load(spritePath);
-      
-      // Genera la lista de sprites individuales del spritesheet
-      final spriteFrames = List<Sprite>.generate(frameCount, (i) => 
-        Sprite(
-          spriteSheet,
-          srcPosition: Vector2(frameWidth * i, 0),
-          srcSize: Vector2(frameWidth, frameHeight),
-        )
-      );
-
-      // Crea la animación con los sprites
-      final spriteAnimation = SpriteAnimation.spriteList(
-        spriteFrames,
-        stepTime: stepTime,
-        loop: loop,
-      );
-
-      // Crea el componente de animación personalizado
-      _animatedComponent = CustomSpriteAnimationComponent(
-        animation: spriteAnimation,
-        frameCount: frameCount,
-        stepTime: stepTime,
-        onLastFrame: onLastFrame,
-      )..anchor = Anchor.center;
-
-      // Ajusta el tamaño del componente
-      if (widgetWidth != null) {
-        double aspectRatio = frameHeight / frameWidth;
-        _animatedComponent!.size =
-            Vector2(widgetWidth!, widgetWidth! * aspectRatio);
-      } else {
-        _animatedComponent!.size = Vector2(frameWidth, frameHeight);
-      }
-
-      // Centra el componente
-      _animatedComponent!.position = size / 2;
-      await add(_animatedComponent!);
-    } catch (e) {
-      debugPrint('Error loading animation: $e');
-    }
-  }
-
-  /// Actualiza la posición del componente en cada frame
-  @override
-  void update(double dt) {
-    if (_isLoaded && _animatedComponent != null) {
-      _animatedComponent!.position = size / 2;
-    }
-    super.update(dt);
-  }
-}
-
-/// Componente personalizado que maneja la lógica de la animación frame por frame
-class CustomSpriteAnimationComponent extends SpriteAnimationComponent {
-  final int frameCount;
-  final double stepTime;
-  final VoidCallback? onLastFrame;
-  // Tiempo acumulado desde el último cambio de frame
-  double _elapsedTime = 0;
-  // Frame actual de la animación
-  int _currentFrame = 0;
-
-  CustomSpriteAnimationComponent({
-    required SpriteAnimation animation,
-    required this.frameCount,
-    required this.stepTime,
-    this.onLastFrame,
-  }) : super(animation: animation);
-
-  /// Se llama en cada frame del juego
-  @override
-  void update(double dt) {
-    super.update(dt);
-    
-    if (animation == null) return;
-
-    // Acumula el tiempo transcurrido
-    _elapsedTime += dt;
-    
-    // Cuando el tiempo acumulado supera el stepTime, cambia al siguiente frame
-    if (_elapsedTime >= stepTime) {
-      _elapsedTime = 0; // Reinicia el contador de tiempo
-      _currentFrame = (_currentFrame + 1) % frameCount; // Avanza al siguiente frame
-      
-      // Solo llama a la función cuando es el último frame
-      if (_currentFrame == frameCount - 1) {
-        onLastFrame?.call();
-      }
-    }
   }
 }
