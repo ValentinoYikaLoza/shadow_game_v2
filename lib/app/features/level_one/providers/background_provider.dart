@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 
 final backgroundProvider =
     StateNotifierProvider<BackgroundNotifier, BackgroundState>((ref) {
@@ -26,43 +24,37 @@ class BackgroundNotifier extends StateNotifier<BackgroundState> {
     return newPosition > 0;
   }
 
+  // Método para verificar si se puede mover a la derecha
   bool canMoveRight(double distanciaRecorrida) {
     final newPosition = state.initialPosition + distanciaRecorrida;
 
-    final doorState = ref.watch(doorProvider);
+    // Permite el movimiento solo si la nueva posición no excede el límite derecho
+    return newPosition < state.rightLimit;
+  }
 
-    debugPrint(doorState.doors.map((door) {
-      return door.initialPosition;
-    }).toString());
-
-    // Busca la puerta de tipo finish y obtiene su posición inicial
-    final lastDoor = doorState.doors.where(
-      (door) {
-        return door.doorType == DoorType.finish;
-      },
-    ).toList();
-
-    if (lastDoor.isEmpty) return newPosition < 1000000;
-
-    debugPrint(lastDoor.first.initialPosition.toString());
-
-    // Solo permite moverse si la nueva posición es menor a la posición de la puerta de salida
-    return newPosition < lastDoor.first.initialPosition + 100;
+  setRightLimit(double rightLimit) {
+    state = state.copyWith(
+      rightLimit: rightLimit,
+    );
   }
 }
 
 class BackgroundState {
   final double initialPosition;
+  final double rightLimit;
 
   BackgroundState({
     this.initialPosition = 0,
+    this.rightLimit = 5000,
   });
 
   BackgroundState copyWith({
     double? initialPosition,
+    double? rightLimit,
   }) {
     return BackgroundState(
       initialPosition: initialPosition ?? this.initialPosition,
+      rightLimit: rightLimit ?? this.rightLimit,
     );
   }
 }

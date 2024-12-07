@@ -11,13 +11,13 @@ class ChestNotifier extends StateNotifier<ChestState> {
   ChestNotifier(this.ref) : super(ChestState());
   final Ref ref;
 
-  void addChest({double initialPosition = 600}) {
-    // print('cofre en x:$initialPosition');
+  void addChest({double initialPosition = 600, double coinValue = 1}) {
     state = state.copyWith(
-      chests: [...state.chests, Chest(initialPosition: initialPosition)],
+      chests: [
+        ...state.chests,
+        Chest(initialPosition: initialPosition, coinValue: coinValue)
+      ],
     );
-
-    ref.read(coinProvider.notifier).addCoin();
   }
 
   void updateXCoords(double distanciaRecorrida) {
@@ -53,12 +53,30 @@ class ChestNotifier extends StateNotifier<ChestState> {
     state = state.copyWith(
       chests: state.chests.map(
         (chest) {
-          if (isPlayerColliding(playerX, chest) &&
-              chest.currentState != ChestStates.open) {
-            print('cofre N ${state.chests.indexOf(chest)}');
-            return chest.copyWith(
-              currentState: ChestStates.open,
-            );
+          if (isPlayerColliding(playerX, chest)) {
+            // // Imprime el índice del cofre y su estado de coinDropped
+            // print('Cofre índice: ${state.chests.indexOf(chest)}, '
+            //     'coinDropped: ${chest.coinDropped}, '
+            //     'Estado actual: ${chest.currentState}, '
+            //     'total cofres: ${state.chests.length}');
+
+            // Si el cofre está cerrado, ábrelo
+            if (chest.currentState == ChestStates.close) {
+              return chest.copyWith(
+                currentState: ChestStates.open,
+              );
+            }
+
+            // Si el cofre está abierto y aún no ha soltado moneda
+            if (chest.currentState == ChestStates.open && !chest.coinDropped) {
+              // Añadir moneda en la posición del cofre
+              ref.read(coinProvider.notifier).addCoin(
+                  initialPosition: chest.initialPosition + 50,
+                  coinValue: chest.coinValue);
+              return chest.copyWith(
+                coinDropped: true,
+              );
+            }
           }
           return chest;
         },
@@ -86,21 +104,30 @@ class ChestState {
 class Chest {
   final double initialPosition;
   final ChestStates currentState;
+  final bool coinDropped;
+  final double coinValue;
   final double width;
+
   Chest({
     this.initialPosition = 600,
     this.currentState = ChestStates.close,
+    this.coinDropped = false,
+    this.coinValue = 1,
     this.width = 60,
   });
 
   Chest copyWith({
     double? initialPosition,
     ChestStates? currentState,
+    bool? coinDropped,
+    double? coinValue,
     double? width,
   }) {
     return Chest(
       initialPosition: initialPosition ?? this.initialPosition,
       currentState: currentState ?? this.currentState,
+      coinDropped: coinDropped ?? this.coinDropped,
+      coinValue: coinValue ?? this.coinValue,
       width: width ?? this.width,
     );
   }

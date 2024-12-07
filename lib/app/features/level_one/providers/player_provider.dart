@@ -93,12 +93,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     resetInactivityTimer();
     final distanciaRecorrida = state.moveAmount * state.playerSpeed;
 
-    // // Verificar si se puede mover a la derecha
-    // if (!ref
-    //     .read(backgroundProvider.notifier)
-    //     .canMoveRight(distanciaRecorrida)) {
-    //   return; // Si no se puede mover, salimos de la función
-    // }
+    // Verificar si se puede mover a la derecha
+    if (!ref
+        .read(backgroundProvider.notifier)
+        .canMoveRight(distanciaRecorrida)) {
+      return; // Si no se puede mover, salimos de la función
+    }
 
     if (state.positionX < rightBoundary / 1.5) {
       // Si no ha llegado al límite derecho, movemos al jugador

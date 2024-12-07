@@ -48,6 +48,7 @@ class ObjectsState extends ConsumerState<Objects> {
           (index) {
             final chest = chestState.chests[index];
             return ChestWidget(
+              key: ValueKey('chest_$index'), // Add unique key
               chest: chest,
               isBoss: index == spiderState.maxSpiders - 1,
             );

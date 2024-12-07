@@ -15,7 +15,9 @@ void main() {
   ]);
   // Oculta la barra de estado y la barra de navegación
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  runApp(const ProviderScope(child: MainApp()));
+  runApp(const ProviderScope(
+    child: MainApp(),
+  ));
 }
 
 class MainApp extends StatelessWidget {

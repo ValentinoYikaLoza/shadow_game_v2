@@ -24,6 +24,7 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
   late AnimationController _jumpController;
   late Animation<double> _positionAnimation;
   bool isJumping = false;
+  int lastCoinCount = 0;
 
   @override
   void initState() {
@@ -57,6 +58,12 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    lastCoinCount = ref.read(coinProvider).coins.length;
+  }
+
+  @override
   void didUpdateWidget(covariant ChestWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
@@ -67,6 +74,15 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
         _jumpController.forward(from: 0);
       });
     }
+
+    final currentCoinCount = ref.watch(coinProvider).coins.length;
+    if (currentCoinCount > lastCoinCount) {
+      // Reinicia la animación cuando hay una nueva moneda
+      _jumpController.reset();
+      _jumpController.forward();
+    }
+
+    lastCoinCount = currentCoinCount; // Actualiza el conteo de monedas
   }
 
   @override
@@ -77,7 +93,7 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
 
   @override
   Widget build(BuildContext context) {
-    final coinState = ref.watch(coinProvider);
+    final coins = ref.watch(coinProvider).coins;
     return Stack(
       children: [
         Positioned(
@@ -89,28 +105,22 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
             loop: false,
           ),
         ),
-        if (widget.chest.currentState != ChestStates.close)
-          ...List.generate(
-            coinState.coins.length,
-            (index) {
-              final coin = coinState.coins[index];
-              return AnimatedBuilder(
+        // Coins
+        ...coins.where((coin) => !coin.coinCollected).map(
+              (coin) => AnimatedBuilder(
                 animation: _positionAnimation,
                 builder: (context, child) {
-                  // print(widget.chest.currentState);
                   return Positioned(
                     bottom: _positionAnimation.value,
-                    left:
-                        widget.chest.initialPosition + (widget.chest.width / 2),
+                    left: coin.initialPosition,
                     child: child!,
                   );
                 },
                 child: CoinWidget(
                   coin: coin,
                 ),
-              );
-            },
-          ),
+              ),
+            ),
       ],
     );
   }

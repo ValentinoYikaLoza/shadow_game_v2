@@ -31,6 +31,7 @@ flutter:
     - assets/images/level_one/
     - assets/images/level_one/door/
     - assets/images/level_one/chest/
+    - assets/images/lobby/
     - assets/images/shared/
     - assets/images/shared/damage/
     - assets/images/shared/endurance/

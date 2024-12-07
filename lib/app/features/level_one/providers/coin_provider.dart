@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+
 final coinProvider = StateNotifierProvider<CoinNotifier, CoinState>((ref) {
   return CoinNotifier(ref);
 });
@@ -8,10 +10,12 @@ class CoinNotifier extends StateNotifier<CoinState> {
   CoinNotifier(this.ref) : super(CoinState());
   final Ref ref;
 
-  void addCoin({double initialPosition = 600, CoinType coinType = CoinType.uncollected}) {
-    // print('cofre en x:$initialPosition');
+  void addCoin({double initialPosition = 600, double coinValue = 1}) {
     state = state.copyWith(
-      coins: [...state.coins, Coin(initialPosition: initialPosition, coinType: coinType)],
+      coins: [
+        ...state.coins,
+        Coin(initialPosition: initialPosition, coinValue: coinValue)
+      ],
     );
   }
 
@@ -49,8 +53,16 @@ class CoinNotifier extends StateNotifier<CoinState> {
       coins: state.coins.map(
         (coin) {
           if (isPlayerColliding(playerX, coin)) {
+            print('coin índice: ${state.coins.indexOf(coin)}, '
+                'coinCollected: ${coin.coinCollected}, '
+                'Total coins: ${state.coins.length}');
+
+            if (!coin.coinCollected) {
+              ref.read(playerProvider.notifier).getCoin(coin.coinValue);
+            }
+
             return coin.copyWith(
-              coinType: CoinType.collected, // New state to trigger jump
+              coinCollected: true,
             );
           }
           return coin;
@@ -78,29 +90,28 @@ class CoinState {
 
 class Coin {
   final double initialPosition;
-  final CoinType coinType;
+  final bool coinCollected;
+  final double coinValue;
   final double width;
 
   Coin({
     this.initialPosition = 600,
-    this.coinType = CoinType.uncollected,
+    this.coinCollected = false,
+    this.coinValue = 1,
     this.width = 5,
   });
 
   Coin copyWith({
     double? initialPosition,
-    CoinType? coinType,
+    bool? coinCollected,
+    double? coinValue,
     double? width,
   }) {
     return Coin(
       initialPosition: initialPosition ?? this.initialPosition,
-      coinType: coinType ?? this.coinType,
+      coinCollected: coinCollected ?? this.coinCollected,
+      coinValue: coinValue ?? this.coinValue,
       width: width ?? this.width,
     );
   }
-}
-
-enum CoinType {
-  collected,
-  uncollected,
 }

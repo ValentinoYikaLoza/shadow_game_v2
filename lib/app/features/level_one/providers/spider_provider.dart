@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
@@ -36,13 +37,8 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
             ]
           : state.spiders,
     );
-    // print('araña ${state.spiders.length} x:$initialPosition');
     startMoving();
   }
-
-  // void killSpider(Spider spider) {
-  //   state.spiders.remove(spider);
-  // }
 
   void updateXCoords(double distanciaRecorrida) {
     state = state.copyWith(
@@ -116,45 +112,55 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
   }
 
   void takeDamage(double damage) {
+    final backgroundPosition = ref.read(backgroundProvider).initialPosition;
     state = state.copyWith(
-        spiders: state.spiders.map((spider) {
-      if (spider.currentState == SpiderStates.attack) {
-        final newHealth = spider.health - damage;
+      spiders: state.spiders.map((spider) {
+        if (spider.currentState == SpiderStates.attack) {
+          final newHealth = spider.health - damage;
+          final spiderIndex = state.spiders.indexOf(spider);
 
-        if (newHealth <= 0) {
-          if (state.spiders.indexOf(spider) == state.maxSpiders - 1) {
-            Future.delayed(const Duration(seconds: 2), () {
-              ref
-                  .read(chestProvider.notifier)
-                  .addChest(initialPosition: spider.initialPosition + 50);
-              ref.read(doorProvider.notifier).addDoor(
-                    initialPosition: spider.initialPosition + 150,
-                    doorType: DoorType.finish,
-                  );
-            });
+          if (newHealth <= 0) {
+            // Si es la última araña
+            if (spiderIndex == state.maxSpiders - 1) {
+              Future.delayed(const Duration(seconds: 2), () {
+                // Limpia todas las arañas
+                state = SpiderState();
+
+                ref.read(chestProvider.notifier).addChest(
+                    initialPosition: spider.initialPosition + 50, coinValue: 5);
+                ref.read(doorProvider.notifier).addDoor(
+                      initialPosition: spider.initialPosition + 150,
+                      doorType: DoorType.finish,
+                    );
+              });
+              final lastPosition = backgroundPosition + 300;
+              print('limit: $lastPosition');
+              ref.read(backgroundProvider.notifier).setRightLimit(lastPosition);
+            }
+            // Si no es la última araña y hay más arañas por matar
+            else if (spiderIndex < state.maxSpiders - 1) {
+              Future.delayed(const Duration(seconds: 2), () {
+                ref
+                    .read(chestProvider.notifier)
+                    .addChest(initialPosition: spider.initialPosition + 50);
+                addSpider(
+                    initialPosition: spider.initialPosition +
+                        (spider.initialPosition +
+                            Random().nextDouble() *
+                                (1500 - spider.initialPosition)));
+              });
+            }
           }
 
-          if (state.spiders.indexOf(spider) < state.maxSpiders) {
-            Future.delayed(const Duration(seconds: 2), () {
-              ref
-                  .read(chestProvider.notifier)
-                  .addChest(initialPosition: spider.initialPosition + 50);
-              addSpider(
-                  initialPosition: spider.initialPosition +
-                      (spider.initialPosition +
-                          Random().nextDouble() *
-                              (1500 - spider.initialPosition)));
-            });
-          }
+          return spider.copyWith(
+            health: newHealth,
+            currentState:
+                newHealth <= 0 ? SpiderStates.die : SpiderStates.attack,
+          );
         }
-
-        return spider.copyWith(
-          health: newHealth,
-          currentState: newHealth <= 0 ? SpiderStates.die : SpiderStates.attack,
-        );
-      }
-      return spider;
-    }).toList());
+        return spider;
+      }).toList(),
+    );
   }
 }
 
@@ -164,7 +170,7 @@ class SpiderState {
 
   SpiderState({
     this.spiders = const [],
-    this.maxSpiders = 2,
+    this.maxSpiders = 5,
   });
 
   SpiderState copyWith({
