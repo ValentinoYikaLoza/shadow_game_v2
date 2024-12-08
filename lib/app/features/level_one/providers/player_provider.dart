@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:shadow_game_v2/app/config/router/app_router.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
@@ -238,8 +240,27 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     );
   }
 
+  void increaseEndurance(double endurancePercentage) {
+    state = state.copyWith(damageResistance: endurancePercentage);
+  }
+
+  void increaseDamage(double newDamage) {
+    state = state.copyWith(damageResistance: newDamage);
+  }
+
+  void increaseMaxLife(double newHealth) {
+    state = state.copyWith(damageResistance: newHealth);
+  }
+
+  void increaseSpeed(double newSpeed) {
+    state = state.copyWith(playerSpeed: newSpeed);
+  }
+
   void takeDamage(double damage) {
-    final newHealth = state.health - damage;
+    // Calculate actual damage based on damage resistance
+    final actualDamage = damage * (1 - (state.damageResistance / 100));
+
+    final newHealth = state.health - actualDamage;
 
     if (newHealth <= 0) {
       AppRouter.go(LobbyRoutes.gameOver.path);
@@ -282,6 +303,7 @@ class PlayerState {
   final double coins;
   final double maxHealth;
   final double attackDamage;
+  final double damageResistance;
 
   PlayerState({
     this.skyPosition = 0,
@@ -297,6 +319,7 @@ class PlayerState {
     this.coins = 0,
     this.maxHealth = 10,
     this.attackDamage = 2,
+    this.damageResistance = 0,
   });
 
   PlayerState copyWith({
@@ -313,6 +336,7 @@ class PlayerState {
     double? coins,
     double? maxHealth,
     double? attackDamage,
+    double? damageResistance,
   }) {
     return PlayerState(
       skyPosition: skyPosition ?? this.skyPosition,
@@ -328,6 +352,7 @@ class PlayerState {
       coins: coins ?? this.coins,
       maxHealth: maxHealth ?? this.maxHealth,
       attackDamage: attackDamage ?? this.attackDamage,
+      damageResistance: damageResistance ?? this.damageResistance,
     );
   }
 }

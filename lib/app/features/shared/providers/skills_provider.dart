@@ -16,8 +16,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelDamage == 1 && playerState.coins >= 1) {
       _updateDamageLevel(2, 1);
+      ref.read(playerProvider.notifier).increaseDamage(playerState.attackDamage + 1);
     } else if (state.currentLevelDamage == 2 && playerState.coins >= 5) {
       _updateDamageLevel(3, 5);
+      ref.read(playerProvider.notifier).increaseDamage(playerState.attackDamage + 2);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
@@ -30,8 +32,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelEndurance == 1 && playerState.coins >= 1) {
       _updateEnduranceLevel(2, 1);
+      ref.read(playerProvider.notifier).increaseEndurance(10);
     } else if (state.currentLevelEndurance == 2 && playerState.coins >= 5) {
       _updateEnduranceLevel(3, 5);
+      ref.read(playerProvider.notifier).increaseEndurance(20);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
@@ -44,8 +48,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelLife == 1 && playerState.coins >= 1) {
       _updateLifeLevel(2, 1);
+      ref.read(playerProvider.notifier).increaseMaxLife(playerState.maxHealth + 1);
     } else if (state.currentLevelLife == 2 && playerState.coins >= 5) {
       _updateLifeLevel(3, 5);
+      ref.read(playerProvider.notifier).increaseMaxLife(playerState.maxHealth + 2);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
@@ -58,8 +64,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelSpeed == 1 && playerState.coins >= 1) {
       _updateSpeedLevel(2, 1);
+      ref.read(playerProvider.notifier).increaseSpeed(playerState.playerSpeed + 0.1);
     } else if (state.currentLevelSpeed == 2 && playerState.coins >= 5) {
       _updateSpeedLevel(3, 5);
+      ref.read(playerProvider.notifier).increaseSpeed(playerState.playerSpeed + 0.2);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
