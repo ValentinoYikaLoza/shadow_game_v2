@@ -93,7 +93,6 @@ class CustomGifState extends State<CustomGif> {
       child: Image.asset(
         imagePath,
         width: widget.width,
-        height: widget.width,
         fit: BoxFit.contain,
         alignment: Alignment.center,
         // Add caching to prevent flickering

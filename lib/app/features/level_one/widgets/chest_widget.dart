@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/coin_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/coin_widget.dart';
 
 class ChestWidget extends ConsumerStatefulWidget {
@@ -97,7 +97,7 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
     return Stack(
       children: [
         Positioned(
-          bottom: 78,
+          bottom: 85,
           left: widget.chest.initialPosition,
           child: CustomGif(
             images: widget.chest.currentState.images,

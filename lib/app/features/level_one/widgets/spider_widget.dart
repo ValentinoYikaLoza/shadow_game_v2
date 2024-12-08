@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 
 class SpiderWidget extends ConsumerStatefulWidget {
   final Spider spider;
@@ -61,9 +61,9 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
     return Positioned(
       bottom: widget.isBoss
           ? widget.spider.currentState == SpiderStates.die
-              ? 20
-              : 35
-          : 75,
+              ? 65
+              : 80
+          : 83,
       left: widget.spider.initialPosition,
       child: GestureDetector(
         onLongPressDown: (_) {

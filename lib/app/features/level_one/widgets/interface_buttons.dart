@@ -4,8 +4,8 @@ import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/characters_animation.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/custom_button.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_button.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/lifebar.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/skills_dialog.dart';
 
@@ -74,11 +74,11 @@ class InterfaceButtons extends ConsumerWidget {
         ),
         // skill button
         Positioned(
-          bottom: 40,
-          left: screen.size.width / 2 - 36.5,
+          bottom: 30,
+          left: screen.size.width / 2 - 75,
           child: CustomButton(
             imagePath: 'assets/images/shared/skillButton.png',
-            scale: 2,
+            width: 150,
             onPressed: () {
               SkillDialog.show();
             },

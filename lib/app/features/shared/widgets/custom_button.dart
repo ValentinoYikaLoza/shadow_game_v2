@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 
 class CustomButton extends StatefulWidget {
   final String imagePath;
-  final double scale;
+  final double width;
   final VoidCallback onPressed;
 
   const CustomButton({
     super.key,
     required this.imagePath,
-    this.scale = 1.5, // Tamaño por defecto
+    required this.width, // Tamaño por defecto
     required this.onPressed,
   });
 
@@ -47,12 +48,10 @@ class CustomButtonState extends State<CustomButton> {
         builder: (context, Color? color, child) {
           return ColorFiltered(
             colorFilter: ColorFilter.mode(color!, BlendMode.srcATop),
-            child: Transform.scale(
-              scale: widget
-                  .scale, // Escala para resaltar el botón, puedes ajustarlo o hacerlo configurable
-              child: Image.asset(
-                widget.imagePath,
-              ),
+            child: CustomGif(
+              images: [widget.imagePath],
+              width: widget.width,
+              loop: false,
             ),
           );
         },

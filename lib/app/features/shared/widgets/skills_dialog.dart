@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/widgets/custom_button.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_button.dart';
 import 'package:shadow_game_v2/app/features/shared/providers/skills_provider.dart';
 
 final GlobalKey<_SkillDialogContentState> _skillDialogKey =
@@ -99,7 +99,7 @@ class _SkillDialogContentState extends ConsumerState<_SkillDialogContent> {
                         children: [
                           CustomButton(
                             imagePath: skillState.currentDamageImage.image,
-                            scale: 0.8,
+                            width: 100,
                             onPressed: () {
                               setState(() {
                                 ref
@@ -111,7 +111,7 @@ class _SkillDialogContentState extends ConsumerState<_SkillDialogContent> {
                           const SizedBox(width: 10),
                           CustomButton(
                             imagePath: skillState.currentEnduranceImage.image,
-                            scale: 0.8,
+                            width: 100,
                             onPressed: () {
                               setState(() {
                                 ref
@@ -123,7 +123,7 @@ class _SkillDialogContentState extends ConsumerState<_SkillDialogContent> {
                           const SizedBox(width: 10),
                           CustomButton(
                             imagePath: skillState.currentLifeImage.image,
-                            scale: 0.8,
+                            width: 100,
                             onPressed: () {
                               setState(() {
                                 ref.read(skillProvider.notifier).levelUPLife();
@@ -133,7 +133,7 @@ class _SkillDialogContentState extends ConsumerState<_SkillDialogContent> {
                           const SizedBox(width: 10),
                           CustomButton(
                             imagePath: skillState.currentSpeedImage.image,
-                            scale: 0.8,
+                            width: 100,
                             onPressed: () {
                               setState(() {
                                 ref.read(skillProvider.notifier).levelUPSpeed();
