@@ -8,6 +8,7 @@ import 'package:shadow_game_v2/app/features/level_one/providers/background_provi
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/snackbar.dart';
 
 final spiderProvider =
     StateNotifierProvider<SpiderNotifier, SpiderState>((ref) {
@@ -20,6 +21,12 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
   final Ref ref;
   Timer? moveTimer;
   Timer? disapearTimer;
+
+  /// Restablece el estado de las arañas
+  void resetData() {
+    moveTimer?.cancel(); // Cancela cualquier temporizador activo
+    state = SpiderState(); // Restaura el estado inicial
+  }
 
   void addSpider({double initialPosition = 500}) {
     state = state.copyWith(
@@ -132,6 +139,8 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
                       initialPosition: spider.initialPosition + 150,
                       doorType: DoorType.finish,
                     );
+                SnackbarService.show(
+                    '¡Felicidades haz completado el primer nivel!');
               });
               final lastPosition = backgroundPosition + 300;
               print('limit: $lastPosition');

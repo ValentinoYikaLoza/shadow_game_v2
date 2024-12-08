@@ -11,6 +11,11 @@ class ChestNotifier extends StateNotifier<ChestState> {
   ChestNotifier(this.ref) : super(ChestState());
   final Ref ref;
 
+  /// Restablece el estado de las arañas
+  void resetData() {
+    state = ChestState(); // Restaura el estado inicial
+  }
+
   void addChest({double initialPosition = 600, double coinValue = 1}) {
     state = state.copyWith(
       chests: [

@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/snackbar.dart'; // Importing player provider to access coins
 
 final skillProvider = StateNotifierProvider<SkillNotifier, SkillState>((ref) {
   return SkillNotifier(ref);
@@ -9,35 +11,95 @@ class SkillNotifier extends StateNotifier<SkillState> {
   final Ref ref;
 
   void levelUPDamage() {
-    if (state.currentLevelDamage >= 3) return;
-    final newLevel = state.currentLevelDamage + 1;
+    final playerState = ref.read(playerProvider);
+
+    // Check coin requirements for each level
+    if (state.currentLevelDamage == 1 && playerState.coins >= 1) {
+      _updateDamageLevel(2, 1);
+    } else if (state.currentLevelDamage == 2 && playerState.coins >= 5) {
+      _updateDamageLevel(3, 5);
+    } else {
+      SnackbarService.show('No hay suficientes monedas');
+      return;
+    }
+  }
+
+  void levelUPEndurance() {
+    final playerState = ref.read(playerProvider);
+
+    // Check coin requirements for each level
+    if (state.currentLevelEndurance == 1 && playerState.coins >= 1) {
+      _updateEnduranceLevel(2, 1);
+    } else if (state.currentLevelEndurance == 2 && playerState.coins >= 5) {
+      _updateEnduranceLevel(3, 5);
+    } else {
+      SnackbarService.show('No hay suficientes monedas');
+      return;
+    }
+  }
+
+  void levelUPLife() {
+    final playerState = ref.read(playerProvider);
+
+    // Check coin requirements for each level
+    if (state.currentLevelLife == 1 && playerState.coins >= 1) {
+      _updateLifeLevel(2, 1);
+    } else if (state.currentLevelLife == 2 && playerState.coins >= 5) {
+      _updateLifeLevel(3, 5);
+    } else {
+      SnackbarService.show('No hay suficientes monedas');
+      return;
+    }
+  }
+
+  void levelUPSpeed() {
+    final playerState = ref.read(playerProvider);
+
+    // Check coin requirements for each level
+    if (state.currentLevelSpeed == 1 && playerState.coins >= 1) {
+      _updateSpeedLevel(2, 1);
+    } else if (state.currentLevelSpeed == 2 && playerState.coins >= 5) {
+      _updateSpeedLevel(3, 5);
+    } else {
+      SnackbarService.show('No hay suficientes monedas');
+      return;
+    }
+  }
+
+  void _updateDamageLevel(double newLevel, double coinCost) {
+    final playerNotifier = ref.read(playerProvider.notifier);
+    playerNotifier.getCoin(-coinCost); // Deduct coins
+
     state = state.copyWith(
       currentLevelDamage: newLevel,
       currentDamageImage: _getSkillGif('damage', newLevel),
     );
   }
 
-  void levelUPEndurance() {
-    if (state.currentLevelEndurance >= 3) return;
-    final newLevel = state.currentLevelEndurance + 1;
+  void _updateEnduranceLevel(double newLevel, double coinCost) {
+    final playerNotifier = ref.read(playerProvider.notifier);
+    playerNotifier.getCoin(-coinCost); // Deduct coins
+
     state = state.copyWith(
       currentLevelEndurance: newLevel,
       currentEnduranceImage: _getSkillGif('endurance', newLevel),
     );
   }
 
-  void levelUPLife() {
-    if (state.currentLevelLife >= 3) return;
-    final newLevel = state.currentLevelLife + 1;
+  void _updateLifeLevel(double newLevel, double coinCost) {
+    final playerNotifier = ref.read(playerProvider.notifier);
+    playerNotifier.getCoin(-coinCost); // Deduct coins
+
     state = state.copyWith(
       currentLevelLife: newLevel,
       currentLifeImage: _getSkillGif('life', newLevel),
     );
   }
 
-  void levelUPSpeed() {
-    if (state.currentLevelSpeed >= 3) return;
-    final newLevel = state.currentLevelSpeed + 1;
+  void _updateSpeedLevel(double newLevel, double coinCost) {
+    final playerNotifier = ref.read(playerProvider.notifier);
+    playerNotifier.getCoin(-coinCost); // Deduct coins
+
     state = state.copyWith(
       currentLevelSpeed: newLevel,
       currentSpeedImage: _getSkillGif('speed', newLevel),

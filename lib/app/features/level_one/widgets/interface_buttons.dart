@@ -18,7 +18,7 @@ class InterfaceButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final screen = MediaQuery.of(context);
+    final screen = MediaQuery.of(context).size;
     final backgroundState = ref.watch(backgroundProvider);
     final playerState = ref.watch(playerProvider);
     return Stack(
@@ -75,7 +75,7 @@ class InterfaceButtons extends ConsumerWidget {
         // skill button
         Positioned(
           bottom: 30,
-          left: screen.size.width / 2 - 75,
+          left: screen.width / 2 - 75,
           child: CustomButton(
             imagePath: 'assets/images/shared/skillButton.png',
             width: 150,

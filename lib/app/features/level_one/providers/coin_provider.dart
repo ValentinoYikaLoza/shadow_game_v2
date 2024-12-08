@@ -10,6 +10,11 @@ class CoinNotifier extends StateNotifier<CoinState> {
   CoinNotifier(this.ref) : super(CoinState());
   final Ref ref;
 
+  /// Restablece el estado de las arañas
+  void resetData() {
+    state = CoinState(); // Restaura el estado inicial
+  }
+
   void addCoin({double initialPosition = 600, double coinValue = 1}) {
     state = state.copyWith(
       coins: [

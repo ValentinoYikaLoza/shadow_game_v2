@@ -17,6 +17,11 @@ class DogNotifier extends StateNotifier<DogState> {
   final Ref ref;
   double? previousPositionX;
 
+  /// Restablece el estado de las arañas
+  void resetData() {
+    state = DogState(); // Restaura el estado inicial
+  }
+
   void followPlayer(PlayerState? previousState, PlayerState playerState) {
     // Definimos la distancia a mantener detrás del jugador
     const double followDistance = 80.0;

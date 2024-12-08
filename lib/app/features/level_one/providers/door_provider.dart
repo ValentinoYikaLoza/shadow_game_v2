@@ -10,6 +10,11 @@ class DoorNotifier extends StateNotifier<DoorState> {
   DoorNotifier(this.ref) : super(DoorState());
   final Ref ref;
 
+  /// Restablece el estado de las arañas
+  void resetData() {
+    state = DoorState(); // Restaura el estado inicial
+  }
+
   void addDoor(
       {double initialPosition = 100, DoorType doorType = DoorType.start}) {
     // print('cofre en x:$initialPosition');

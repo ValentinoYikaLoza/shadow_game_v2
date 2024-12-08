@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/loader.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/snackbar.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -9,8 +10,10 @@ class App extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) {
-    return LoaderProvider(
-      child: child,
+    return SnackbarProvider(
+      child: LoaderProvider(
+        child: child,
+      ),
     );
   }
 }

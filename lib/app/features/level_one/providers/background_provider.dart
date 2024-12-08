@@ -9,6 +9,11 @@ class BackgroundNotifier extends StateNotifier<BackgroundState> {
   BackgroundNotifier(this.ref) : super(BackgroundState());
   final Ref ref;
 
+  /// Restablece el estado de las arañas
+  void resetData() {
+    state = BackgroundState(); // Restaura el estado inicial
+  }
+
   void updateXCoords(double distanciaRecorrida) {
     final newPosition = state.initialPosition + distanciaRecorrida;
     state = state.copyWith(

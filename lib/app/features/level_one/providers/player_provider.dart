@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/config/router/app_router.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
@@ -7,6 +8,7 @@ import 'package:shadow_game_v2/app/features/level_one/providers/coin_provider.da
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
+import 'package:shadow_game_v2/app/features/lobby/routes/lobby_routes.dart';
 
 final playerProvider =
     StateNotifierProvider<PlayerNotifier, PlayerState>((ref) {
@@ -23,6 +25,18 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
 
   // Duración de tiempo para considerar inactividad
   static const inactivityDuration = Duration(seconds: 5);
+
+  void resetData() {
+    state = PlayerState(); // Restablece todos los valores al estado inicial
+    ref
+        .read(backgroundProvider.notifier)
+        .resetData(); // Reinicia las posiciones de fondo
+    ref.read(doorProvider.notifier).resetData(); // Reinicia las puertas
+    ref.read(dogProvider.notifier).resetData(); // Reinicia las puertas
+    ref.read(coinProvider.notifier).resetData(); // Reinicia las monedas
+    ref.read(chestProvider.notifier).resetData(); // Reinicia los cofres
+    ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
+  }
 
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
@@ -225,8 +239,14 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void takeDamage(double damage) {
+    final newHealth = state.health - damage;
+
+    if (newHealth <= 0) {
+      AppRouter.go(LobbyRoutes.gameOver.path);
+    }
+
     state = state.copyWith(
-      health: state.health - damage,
+      health: newHealth,
     );
   }
 
@@ -235,8 +255,6 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       coins: state.coins + amount,
     );
   }
-
-  void die() {}
 
   void attack() {
     resetInactivityTimer();
