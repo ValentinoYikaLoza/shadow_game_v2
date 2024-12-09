@@ -45,6 +45,38 @@ class GesturesState extends ConsumerState<Gestures> {
                         : null;
                   });
                 },
+                onLongPress: () {
+                  setState(() {
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
+                        ? ref.read(playerProvider.notifier).moveLeft()
+                        : null;
+                  });
+                },
+                onLongPressDown: (_) {
+                  setState(() {
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
+                        ? ref.read(playerProvider.notifier).moveLeft()
+                        : null;
+                  });
+                },
                 onLongPressMoveUpdate: (_) {
                   setState(() {
                     !spiderState.spiders
@@ -86,6 +118,42 @@ class GesturesState extends ConsumerState<Gestures> {
             Expanded(
               child: GestureDetector(
                 onTapDown: (_) {
+                  setState(() {
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
+                        ? ref
+                            .read(playerProvider.notifier)
+                            .moveRight(screen.size.width - 70)
+                        : null;
+                  });
+                },
+                onLongPress: () {
+                  setState(() {
+                    !spiderState.spiders
+                            .where(
+                              (spider) {
+                                return spider.currentState ==
+                                        SpiderStates.walk ||
+                                    spider.currentState == SpiderStates.attack;
+                              },
+                            )
+                            .toList()
+                            .isNotEmpty
+                        ? ref
+                            .read(playerProvider.notifier)
+                            .moveRight(screen.size.width - 70)
+                        : null;
+                  });
+                },
+                onLongPressDown: (_) {
                   setState(() {
                     !spiderState.spiders
                             .where(

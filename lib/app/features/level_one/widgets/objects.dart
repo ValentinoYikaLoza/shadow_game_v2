@@ -31,6 +31,8 @@ class ObjectsState extends ConsumerState<Objects> {
     final doorState = ref.watch(doorProvider);
     final chestState = ref.watch(chestProvider);
     final spiderState = ref.watch(spiderProvider);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final groundHeight = screenHeight * 0.3;
     return Stack(
       children: [
         widget.child,
@@ -39,7 +41,10 @@ class ObjectsState extends ConsumerState<Objects> {
           doorState.doors.length,
           (index) {
             final door = doorState.doors[index];
-            return DoorWidget(door: door);
+            return DoorWidget(
+              door: door,
+              groundHeight: groundHeight - 28,
+            );
           },
         ),
         // Cofre
@@ -50,6 +55,7 @@ class ObjectsState extends ConsumerState<Objects> {
             return ChestWidget(
               key: ValueKey('chest_$index'), // Add unique key
               chest: chest,
+              groundHeight: groundHeight,
               isBoss: index == spiderState.maxSpiders - 1,
             );
           },

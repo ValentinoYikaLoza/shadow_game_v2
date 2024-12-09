@@ -4,15 +4,17 @@ import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 
 class DoorWidget extends StatelessWidget {
   final Door door;
+  final double groundHeight;
   const DoorWidget({
     super.key,
     required this.door,
+    required this.groundHeight,
   });
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 58,
+      bottom: groundHeight,
       left: door.initialPosition,
       child: Column(
         children: [

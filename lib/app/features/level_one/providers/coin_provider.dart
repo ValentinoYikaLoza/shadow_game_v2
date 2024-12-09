@@ -58,9 +58,9 @@ class CoinNotifier extends StateNotifier<CoinState> {
       coins: state.coins.map(
         (coin) {
           if (isPlayerColliding(playerX, coin)) {
-            print('coin índice: ${state.coins.indexOf(coin)}, '
-                'coinCollected: ${coin.coinCollected}, '
-                'Total coins: ${state.coins.length}');
+            // print('coin índice: ${state.coins.indexOf(coin)}, '
+            //     'coinCollected: ${coin.coinCollected}, '
+            //     'Total coins: ${state.coins.length}');
 
             if (!coin.coinCollected) {
               ref.read(playerProvider.notifier).getCoin(coin.coinValue);

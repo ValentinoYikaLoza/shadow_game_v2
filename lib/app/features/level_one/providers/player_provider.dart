@@ -29,7 +29,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   static const inactivityDuration = Duration(seconds: 5);
 
   void resetData() {
-    state = PlayerState(); // Restablece todos los valores al estado inicial
+    state = PlayerState();
     ref
         .read(backgroundProvider.notifier)
         .resetData(); // Reinicia las posiciones de fondo
@@ -61,7 +61,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
 
       _jumpTimer?.cancel();
       _jumpTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-        if (state.positionY <= 105) {
+        if (state.positionY <= 25) {
           state = state.copyWith(
             positionY: state.positionY + 5,
           );
@@ -77,7 +77,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     resetInactivityTimer();
     _fallTimer?.cancel();
     _fallTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      if (state.positionY >= 90) {
+      if (state.positionY >= 5) {
         state = state.copyWith(
           positionY: state.positionY - 5,
         );
@@ -90,6 +90,10 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
 
   void land() {
     resetInactivityTimer();
+    print('endurance: ${state.damageResistance}');
+    print('damage: ${state.attackDamage}');
+    print('life: ${state.maxHealth}');
+    print('speed: ${state.playerSpeed}');
     state = state.copyWith(
       isJumping: false,
       currentState: PlayerStates.stay,
@@ -106,6 +110,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   static const double leftBoundary = 20.0;
 
   void moveRight(double rightBoundary) {
+    // print(state.positionY);
     resetInactivityTimer();
     final distanciaRecorrida = state.moveAmount * state.playerSpeed;
 
@@ -245,11 +250,14 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void increaseDamage(double newDamage) {
-    state = state.copyWith(damageResistance: newDamage);
+    state = state.copyWith(attackDamage: newDamage);
   }
 
   void increaseMaxLife(double newHealth) {
-    state = state.copyWith(damageResistance: newHealth);
+    state = state.copyWith(
+      maxHealth: newHealth,
+      health: state.health == state.maxHealth ? newHealth : 0,
+    );
   }
 
   void increaseSpeed(double newSpeed) {
@@ -309,7 +317,7 @@ class PlayerState {
     this.skyPosition = 0,
     this.groundPosition = 0,
     this.positionX = 20,
-    this.positionY = 85,
+    this.positionY = 0,
     this.isJumping = false,
     this.currentDirection = Directions.right,
     this.currentState = PlayerStates.stay,

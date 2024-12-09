@@ -58,12 +58,14 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final groundHeight = screenHeight * 0.3;
     return Positioned(
       bottom: widget.isBoss
           ? widget.spider.currentState == SpiderStates.die
-              ? 65
-              : 80
-          : 83,
+              ? groundHeight - 20
+              : groundHeight - 5
+          : groundHeight - 2,
       left: widget.spider.initialPosition,
       child: GestureDetector(
         onLongPressDown: (_) {

@@ -1,42 +1,50 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class ParallaxBackground extends StatelessWidget {
   final String imagePath;
-  final double position;
+  final double positionLeft;
   final double speed;
-  
+  final double? height;
+
   const ParallaxBackground({
     super.key,
     required this.imagePath,
-    required this.position,
+    required this.positionLeft,
     required this.speed,
+    this.height,
   });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Calcular cuántas imágenes necesitamos para cubrir la pantalla
-        final imageWidth = constraints.maxWidth;
-        final count = (constraints.maxWidth / imageWidth).ceil() + 2;
+        final screenWidth = constraints.maxWidth;
+        final imageHeight = height ?? constraints.maxHeight;
 
-        return Stack(
-          children: List.generate(count, (index) {
-            // Calcular la posición real teniendo en cuenta el scroll infinito
-            double actualPosition = position % imageWidth;
-            double xPosition =
-                (index * imageWidth + actualPosition) - imageWidth;
+        // Calculate how many images we need to cover the width
+        final count = (screenWidth / screenWidth).ceil() + 2;
 
-            return Positioned(
-              left: xPosition,
-              child: Image.asset(
-                imagePath,
-                width: imageWidth,
-                height: constraints.maxHeight,
-                fit: BoxFit.cover,
-              ),
-            );
-          }),
+        return SizedBox(
+          width: screenWidth,
+          height: imageHeight,
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: List.generate(count, (index) {
+              double actualPosition = positionLeft % screenWidth;
+              double xPosition =
+                  (index * screenWidth + actualPosition) - screenWidth;
+
+              return Positioned(
+                left: xPosition,
+                child: Image.asset(
+                  imagePath,
+                  width: screenWidth,
+                  height: imageHeight,
+                  fit: BoxFit.cover, // Ensure image covers without distortion
+                ),
+              );
+            }),
+          ),
         );
       },
     );

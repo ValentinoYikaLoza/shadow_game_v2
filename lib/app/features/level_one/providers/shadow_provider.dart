@@ -81,14 +81,12 @@ class DogNotifier extends StateNotifier<DogState> {
 
 class DogState {
   final double positionX;
-  final double positionY;
   final ShadowStates currentState;
   final Directions currentDirection;
   final bool isEnemyNear;
 
   DogState({
     this.positionX = 45,
-    this.positionY = 85,
     this.isEnemyNear = false,
     this.currentState = ShadowStates.sit,
     this.currentDirection = Directions.left,
@@ -96,14 +94,12 @@ class DogState {
 
   DogState copyWith({
     double? positionX,
-    double? positionY,
     ShadowStates? currentState,
     Directions? currentDirection,
     bool? isEnemyNear,
   }) {
     return DogState(
       positionX: positionX ?? this.positionX,
-      positionY: positionY ?? this.positionY,
       currentState: currentState ?? this.currentState,
       currentDirection: currentDirection ?? this.currentDirection,
       isEnemyNear: isEnemyNear ?? this.isEnemyNear,

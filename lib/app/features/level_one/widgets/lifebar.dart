@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Lifebar extends StatelessWidget {
+class Lifebar extends StatefulWidget {
   final double totalHearts;
   final double fullHearts;
   const Lifebar({
@@ -10,16 +10,34 @@ class Lifebar extends StatelessWidget {
   });
 
   @override
+  State<Lifebar> createState() => _LifebarState();
+}
+
+class _LifebarState extends State<Lifebar> {
+
+  @override
+  void didUpdateWidget(Lifebar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Verificar si los valores han cambiado
+    if (widget.totalHearts != oldWidget.totalHearts || 
+        widget.fullHearts != oldWidget.fullHearts) {
+      // Forzar una reconstrucción del widget
+      setState(() {
+        print(widget.totalHearts);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 16.5,
-      width: 22.5 * totalHearts,
+      width: 22.5 * widget.totalHearts,
       child: Stack(
-        children: List.generate(totalHearts.toInt(), (index) {
-          double offset =
-              index * 22.5; // Desplazamiento para que se superpongan
+        children: List.generate(widget.totalHearts.toInt(), (index) {
+          double offset = index * 22.5;
 
-          Widget heart = (index < fullHearts)
+          Widget heart = (index < widget.fullHearts)
               ? SizedBox(
                   width: 19.5,
                   child: Image.asset(
@@ -42,7 +60,7 @@ class Lifebar extends StatelessWidget {
                 );
 
           return Positioned(
-            left: offset, // Desplazamiento para superponer los corazones
+            left: offset,
             child: heart,
           );
         }),

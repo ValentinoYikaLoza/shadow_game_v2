@@ -9,9 +9,11 @@ import 'package:shadow_game_v2/app/features/level_one/widgets/coin_widget.dart';
 class ChestWidget extends ConsumerStatefulWidget {
   final Chest chest;
   final bool isBoss;
+  final double groundHeight;
   const ChestWidget({
     super.key,
     required this.chest,
+    required this.groundHeight,
     this.isBoss = false,
   });
 
@@ -36,11 +38,11 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
 
     _positionAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 100, end: 180),
+        tween: Tween<double>(begin: widget.groundHeight + 15, end: widget.groundHeight + 95),
         weight: 0.4,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 180, end: 85),
+        tween: Tween<double>(begin: widget.groundHeight + 95, end: widget.groundHeight),
         weight: 0.6,
       ),
     ]).animate(CurvedAnimation(
@@ -97,7 +99,7 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
     return Stack(
       children: [
         Positioned(
-          bottom: 85,
+          bottom: widget.groundHeight,
           left: widget.chest.initialPosition,
           child: CustomGif(
             images: widget.chest.currentState.images,

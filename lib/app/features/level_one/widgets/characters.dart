@@ -32,6 +32,8 @@ class CharactersState extends ConsumerState<Characters> {
     final playerState = ref.watch(playerProvider);
     final dogState = ref.watch(dogProvider);
     final spiderState = ref.watch(spiderProvider);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final groundHeight = screenHeight * 0.3;
     return Stack(
       children: [
         widget.child,
@@ -48,7 +50,7 @@ class CharactersState extends ConsumerState<Characters> {
         ),
         // Perro
         Positioned(
-          bottom: dogState.positionY,
+          bottom: groundHeight,
           left: dogState.positionX,
           child: GestureDetector(
             onLongPressDown: (_) {
@@ -76,7 +78,7 @@ class CharactersState extends ConsumerState<Characters> {
         ),
         // Jugador
         Positioned(
-          bottom: playerState.positionY,
+          bottom: groundHeight + playerState.positionY,
           left: playerState.positionX,
           child: GestureDetector(
             onLongPressDown: (_) {

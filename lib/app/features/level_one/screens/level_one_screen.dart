@@ -19,7 +19,6 @@ class LevelOneScreen extends ConsumerStatefulWidget {
 class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context);
     final playerState = ref.watch(playerProvider);
     return Scaffold(
       body: SkillProvider(
@@ -29,25 +28,29 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
             child: Objects(
               child: Gestures(
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    // Capa del cielo con repetición
-                    SizedBox(
-                      width: screen.size.width,
-                      height: screen.size.height,
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
                       child: ParallaxBackground(
                         imagePath: 'assets/images/level_one/sky.png',
-                        position: playerState.skyPosition,
+                        positionLeft: playerState.skyPosition,
                         speed: playerState.playerSpeed,
+                        height: MediaQuery.of(context).size.height * 0.8,
                       ),
                     ),
-                    // Capa del suelo con repetición
-                    SizedBox(
-                      width: screen.size.width,
-                      height: screen.size.height,
+                    // Ground background always at the bottom
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
                       child: ParallaxBackground(
                         imagePath: 'assets/images/level_one/ground.png',
-                        position: playerState.groundPosition,
+                        positionLeft: playerState.groundPosition,
                         speed: playerState.playerSpeed,
+                        height: MediaQuery.of(context).size.height * 0.3, // Adjust height as needed
                       ),
                     ),
                   ],
