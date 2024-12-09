@@ -23,20 +23,11 @@ class GameOverScreen extends StatelessWidget {
             'assets/icon.jpg',
           ),
           Positioned(
-            top: screenSize.height * 0.15,
-            left: screenSize.width / 2 - ((screenSize.width * 0.7) / 2),
-            child: CustomGif(
-              images: const ['assets/images/lobby/shadow_game.png'],
-              width: screenSize.width * 0.7,
-              loop: false,
-            ),
-          ),
-          Positioned(
-            top: screenSize.height * 0.4,
-            left: screenSize.width - ((screenSize.width * 0.75)),
+            top: screenSize.height * 0.45,
+            left: screenSize.width - ((screenSize.width * 0.55)),
             child: CustomButton(
               imagePath: 'assets/images/lobby/game_over.png',
-              width: screenSize.width * 0.7,
+              width: screenSize.width * 0.5,
               onPressed: () {
                 Loader.show();
                 AppRouter.go(LobbyRoutes.startGame.path);
