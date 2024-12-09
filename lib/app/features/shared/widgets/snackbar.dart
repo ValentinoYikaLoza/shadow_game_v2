@@ -147,7 +147,7 @@ class _CustomSnackbarMobile extends StatelessWidget {
                 Radius.circular(10),
               ),
               border: Border.all(
-                color: AppColors.other,
+                color: AppColors.blue,
               ),
             ),
             child: Row(
@@ -156,7 +156,7 @@ class _CustomSnackbarMobile extends StatelessWidget {
                 Container(
                   width: 8,
                   height: 83,
-                  color: AppColors.other,
+                  color: AppColors.blue,
                 ),
                 const SizedBox(
                   width: 11,
@@ -180,7 +180,7 @@ class _CustomSnackbarMobile extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.other,
+                      color: AppColors.blue,
                       height: 20 / 16,
                       leadingDistribution: TextLeadingDistribution.even,
                     ),

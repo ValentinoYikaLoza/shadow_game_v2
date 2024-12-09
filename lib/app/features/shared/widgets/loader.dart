@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
+import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 
 final GlobalKey<_LoaderContentState> _loaderKey =
     GlobalKey<_LoaderContentState>();
 
 class Loader {
-  static show() {
+  static show([String message = 'Cargando']) {
     if (_loaderKey.currentState != null) {
-      _loaderKey.currentState!.show();
+      _loaderKey.currentState!.show(message);
     }
   }
 
@@ -48,10 +50,12 @@ class _LoaderContent extends StatefulWidget {
 
 class _LoaderContentState extends State<_LoaderContent> {
   bool showLoader = false;
+  String message = 'Loading';
 
-  show() {
+  show([String message = 'Loading']) {
     setState(() {
       showLoader = true;
+      this.message = message;
     });
   }
 
@@ -68,11 +72,37 @@ class _LoaderContentState extends State<_LoaderContent> {
         if (widget.child != null) widget.child!,
         if (showLoader)
           Container(
-            color: AppColors.black.withOpacity(0.5),
+            color: AppColors.gray3,
             child: Center(
-              child: Image.asset(
-                'assets/gifs/walk.gif',
-                height: 116,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomGif(
+                        images: ShadowStates.walk.images,
+                        width: 70,
+                        loop: true,
+                      ),
+                      CustomGif(
+                        images: PlayerStates.walk.images,
+                        width: 50,
+                        loop: true,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: SizedBox(
+                      width: 150,
+                      child: Image.asset(
+                        'assets/gifs/loading.gif',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
           ),

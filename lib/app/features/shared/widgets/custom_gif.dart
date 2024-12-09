@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class CustomGif extends StatefulWidget {
   final List<String> images;
   final double width;
+  final double? height;
   final bool loop;
   final bool flip;
   final double speed;
@@ -14,6 +15,7 @@ class CustomGif extends StatefulWidget {
     super.key,
     required this.images,
     this.width = 100.0,
+    this.height,
     this.loop = true,
     this.flip = false,
     this.speed = 0.1,
@@ -93,6 +95,7 @@ class CustomGifState extends State<CustomGif> {
       child: Image.asset(
         imagePath,
         width: widget.width,
+        height: widget.height,
         fit: BoxFit.contain,
         alignment: Alignment.center,
         // Add caching to prevent flickering
