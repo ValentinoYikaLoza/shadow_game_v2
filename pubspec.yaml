@@ -38,20 +38,8 @@ flutter:
     - assets/images/shared/endurance/
     - assets/images/shared/speed/
     - assets/images/shared/life/
-    - assets/gifs/player/
-    - assets/gifs/shadow/
-    - assets/gifs/spider/
     - assets/gifs/
-    - assets/images/sheets/player/
-    - assets/images/sheets/shadow/
-    - assets/images/sheets/spider/
-    - assets/images/sheets/icons/
     - assets/icons/
-    - assets/json/player/
-    - assets/json/shadow/
-    - assets/json/spider/
-    - assets/json/objects/
-    - assets/json/
     - assets/frames/player/attack/
     - assets/frames/player/dance/
     - assets/frames/player/jump/
@@ -65,4 +53,5 @@ flutter:
     - assets/frames/spider/walk/
     - assets/frames/spider/stay/
     - assets/frames/objects/coin/
+    - assets/frames/objects/loading/
     - assets/frames/
