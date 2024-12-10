@@ -15,6 +15,7 @@ final router = GoRouter(
     ),
     LobbyRoutes.startGame,
     LobbyRoutes.gameOver,
+    LobbyRoutes.tutorial,
     LevelOneRoutes.levelOne,
   ],
 );

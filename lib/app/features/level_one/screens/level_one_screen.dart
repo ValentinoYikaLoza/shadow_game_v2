@@ -18,6 +18,14 @@ class LevelOneScreen extends ConsumerStatefulWidget {
 
 class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
   @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.read(playerProvider.notifier).resetData();
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final playerState = ref.watch(playerProvider);
     return Scaffold(
@@ -50,7 +58,8 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
                         imagePath: 'assets/images/level_one/ground.png',
                         positionLeft: playerState.groundPosition,
                         speed: playerState.playerSpeed,
-                        height: MediaQuery.of(context).size.height * 0.3, // Adjust height as needed
+                        height: MediaQuery.of(context).size.height *
+                            0.3, // Adjust height as needed
                       ),
                     ),
                   ],

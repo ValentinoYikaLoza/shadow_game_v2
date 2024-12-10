@@ -78,10 +78,41 @@ class InterfaceButtons extends ConsumerWidget {
           bottom: groundHeight,
           left: screenSize.width / 2 - (screenSize.width * 0.2) / 2,
           child: CustomButton(
-            imagePath: 'assets/images/shared/skillButton.png',
+            imagePath: 'assets/images/lobby/skills.png',
             width: screenSize.width * 0.2,
             onPressed: () {
               SkillDialog.show();
+            },
+          ),
+        ),
+
+        Positioned(
+          bottom: screenSize.height * 0.08,
+          left: screenSize.width / 2 - (screenSize.width * 0.15) / 2,
+          child: CustomButton(
+            imagePath: 'assets/images/lobby/tutorial.png',
+            width: screenSize.width * 0.15,
+            onPressed: () {
+              // SnackbarService.showMultipleMessages(
+              //   [
+              //     'Hola soy Shadow, y este es mi juego',
+              //     'te enseñaré lo básico para aprender a moverte',
+              //     'debes mantener presionado y luego deslizar en circulos',
+              //     'nos moveremos a la dirección donde presiones',
+              //     'cuando te encuentres con un enemigo no podrás moverte',
+              //     'tendrás que matar al enemigo, es muy facil...',
+              //     'solo presionas encima del enemigo y le harás daño',
+              //     'consejo: presiona muchas veces para matarlo',
+              //     'una vez muerto podrás seguir avanzando',
+              //     'cuando encuentres un cofre pasa por encima y se abrirá',
+              //     'por ahora solo te da monedas',
+              //     'pero pronto se irán añadiendo otros objetos',
+              //     'las monedas sirven para aumentar tus habilidades',
+              //     'si presionas en skills, podrás subirlas de nivel',
+              //     'eso sería todo, disfruta el juego',
+              //   ],
+              //   type: SnackbarType.tutorial,
+              // );
             },
           ),
         ),

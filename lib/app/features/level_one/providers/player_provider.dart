@@ -40,6 +40,18 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
   }
 
+  void tutorialMode() {
+    state = PlayerState(tutorialMode: true);
+    ref
+        .read(backgroundProvider.notifier)
+        .resetData(); // Reinicia las posiciones de fondo
+    ref.read(doorProvider.notifier).resetData(); // Reinicia las puertas
+    ref.read(dogProvider.notifier).resetData(); // Reinicia las puertas
+    ref.read(coinProvider.notifier).resetData(); // Reinicia las monedas
+    ref.read(chestProvider.notifier).resetData(); // Reinicia los cofres
+    ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
+  }
+
   void _startInactivityTimer() {
     _inactivityTimer?.cancel();
     _inactivityTimer = Timer(inactivityDuration, () {
@@ -90,10 +102,10 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
 
   void land() {
     resetInactivityTimer();
-    print('endurance: ${state.damageResistance}');
-    print('damage: ${state.attackDamage}');
-    print('life: ${state.maxHealth}');
-    print('speed: ${state.playerSpeed}');
+    // print('endurance: ${state.damageResistance}');
+    // print('damage: ${state.attackDamage}');
+    // print('life: ${state.maxHealth}');
+    // print('speed: ${state.playerSpeed}');
     state = state.copyWith(
       isJumping: false,
       currentState: PlayerStates.stay,
@@ -109,9 +121,11 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   // Definimos los límites del jugador en la pantalla
   static const double leftBoundary = 20.0;
 
-  void moveRight(double rightBoundary) {
-    // print(state.positionY);
+  void moveRight(double rightLimit) {
+    print(state.positionX);
     resetInactivityTimer();
+
+    final rightBoundary = state.tutorialMode ? rightLimit : rightLimit / 1.5;
     final distanciaRecorrida = state.moveAmount * state.playerSpeed;
 
     // Verificar si se puede mover a la derecha
@@ -121,7 +135,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       return; // Si no se puede mover, salimos de la función
     }
 
-    if (state.positionX < rightBoundary / 1.5) {
+    if (state.positionX < rightBoundary) {
       // Si no ha llegado al límite derecho, movemos al jugador
       state = state.copyWith(
         positionX: state.positionX + distanciaRecorrida,
@@ -131,17 +145,23 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     } else {
       // Si está en el límite derecho, movemos el fondo
       state = state.copyWith(
-        skyPosition: state.skyPosition - distanciaRecorrida,
-        groundPosition: state.groundPosition - distanciaRecorrida,
+        skyPosition:
+            state.skyPosition - (!state.tutorialMode ? distanciaRecorrida : 0),
+        groundPosition: state.groundPosition -
+            (!state.tutorialMode ? distanciaRecorrida : 0),
         currentDirection: Directions.right,
         currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
       );
-      ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(coinProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
+      if (!state.tutorialMode) {
+        ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
+        ref.read(coinProvider.notifier).updateXCoords(-distanciaRecorrida);
+        ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
+        ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
+      }
     }
-    ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
+    if (!state.tutorialMode) {
+      ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
+    }
     checkCollisionsDoors();
     checkCollisionsCoins();
     checkCollisionsChests();
@@ -179,7 +199,6 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
       ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
       ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
     }
-
     ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
     checkCollisionsDoors();
     checkCollisionsCoins();
@@ -312,6 +331,7 @@ class PlayerState {
   final double maxHealth;
   final double attackDamage;
   final double damageResistance;
+  final bool tutorialMode;
 
   PlayerState({
     this.skyPosition = 0,
@@ -328,6 +348,7 @@ class PlayerState {
     this.maxHealth = 10,
     this.attackDamage = 2,
     this.damageResistance = 0,
+    this.tutorialMode = false,
   });
 
   PlayerState copyWith({
@@ -345,6 +366,7 @@ class PlayerState {
     double? maxHealth,
     double? attackDamage,
     double? damageResistance,
+    bool? tutorialMode,
   }) {
     return PlayerState(
       skyPosition: skyPosition ?? this.skyPosition,
@@ -361,6 +383,7 @@ class PlayerState {
       maxHealth: maxHealth ?? this.maxHealth,
       attackDamage: attackDamage ?? this.attackDamage,
       damageResistance: damageResistance ?? this.damageResistance,
+      tutorialMode: tutorialMode ?? this.tutorialMode,
     );
   }
 }
