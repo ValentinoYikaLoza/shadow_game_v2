@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/snackbar.dart'; // Importing player provider to access coins
 
 final skillProvider = StateNotifierProvider<SkillNotifier, SkillState>((ref) {
@@ -16,10 +16,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelDamage == 1 && playerState.coins >= 1) {
       _updateDamageLevel(2, 1);
-      ref.read(playerProvider.notifier).increaseDamage(playerState.attackDamage + 1);
+      ref.read(playerProvider.notifier).updateDamage(2);
     } else if (state.currentLevelDamage == 2 && playerState.coins >= 5) {
       _updateDamageLevel(3, 5);
-      ref.read(playerProvider.notifier).increaseDamage(playerState.attackDamage + 2);
+      ref.read(playerProvider.notifier).updateDamage(2);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
@@ -32,10 +32,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelEndurance == 1 && playerState.coins >= 1) {
       _updateEnduranceLevel(2, 1);
-      ref.read(playerProvider.notifier).increaseEndurance(10);
+      ref.read(playerProvider.notifier).updateDamageResistance(0.3);
     } else if (state.currentLevelEndurance == 2 && playerState.coins >= 5) {
       _updateEnduranceLevel(3, 5);
-      ref.read(playerProvider.notifier).increaseEndurance(20);
+      ref.read(playerProvider.notifier).updateDamageResistance(0.5);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
@@ -48,10 +48,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelLife == 1 && playerState.coins >= 1) {
       _updateLifeLevel(2, 1);
-      ref.read(playerProvider.notifier).increaseMaxLife(playerState.maxHealth + 1);
+      ref.read(playerProvider.notifier).updateMaxLives(11);
     } else if (state.currentLevelLife == 2 && playerState.coins >= 5) {
       _updateLifeLevel(3, 5);
-      ref.read(playerProvider.notifier).increaseMaxLife(playerState.maxHealth + 2);
+      ref.read(playerProvider.notifier).updateMaxLives(12);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
@@ -64,10 +64,10 @@ class SkillNotifier extends StateNotifier<SkillState> {
     // Check coin requirements for each level
     if (state.currentLevelSpeed == 1 && playerState.coins >= 1) {
       _updateSpeedLevel(2, 1);
-      ref.read(playerProvider.notifier).increaseSpeed(playerState.playerSpeed + 0.1);
+      ref.read(playerProvider.notifier).updateSpeed(0.5);
     } else if (state.currentLevelSpeed == 2 && playerState.coins >= 5) {
       _updateSpeedLevel(3, 5);
-      ref.read(playerProvider.notifier).increaseSpeed(playerState.playerSpeed + 0.2);
+      ref.read(playerProvider.notifier).updateSpeed(0.8);
     } else {
       SnackbarService.show('No hay suficientes monedas');
       return;
@@ -76,7 +76,7 @@ class SkillNotifier extends StateNotifier<SkillState> {
 
   void _updateDamageLevel(double newLevel, double coinCost) {
     final playerNotifier = ref.read(playerProvider.notifier);
-    playerNotifier.getCoin(-coinCost); // Deduct coins
+    playerNotifier.addCoins(-coinCost); // Deduct coins
 
     state = state.copyWith(
       currentLevelDamage: newLevel,
@@ -86,7 +86,7 @@ class SkillNotifier extends StateNotifier<SkillState> {
 
   void _updateEnduranceLevel(double newLevel, double coinCost) {
     final playerNotifier = ref.read(playerProvider.notifier);
-    playerNotifier.getCoin(-coinCost); // Deduct coins
+    playerNotifier.addCoins(-coinCost); // Deduct coins
 
     state = state.copyWith(
       currentLevelEndurance: newLevel,
@@ -96,7 +96,7 @@ class SkillNotifier extends StateNotifier<SkillState> {
 
   void _updateLifeLevel(double newLevel, double coinCost) {
     final playerNotifier = ref.read(playerProvider.notifier);
-    playerNotifier.getCoin(-coinCost); // Deduct coins
+    playerNotifier.addCoins(-coinCost); // Deduct coins
 
     state = state.copyWith(
       currentLevelLife: newLevel,
@@ -106,7 +106,7 @@ class SkillNotifier extends StateNotifier<SkillState> {
 
   void _updateSpeedLevel(double newLevel, double coinCost) {
     final playerNotifier = ref.read(playerProvider.notifier);
-    playerNotifier.getCoin(-coinCost); // Deduct coins
+    playerNotifier.addCoins(-coinCost); // Deduct coins
 
     state = state.copyWith(
       currentLevelSpeed: newLevel,

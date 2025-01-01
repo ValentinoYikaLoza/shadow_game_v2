@@ -1,11 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
+import 'package:shadow_game_v2/app/config/router/app_router.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/gestures.dart';
+import 'package:shadow_game_v2/app/features/level_one/widgets/interface_buttons.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/objects.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/parallax_background.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/characters.dart'
     as characters;
+import 'package:shadow_game_v2/app/features/lobby/routes/lobby_routes.dart';
+import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 
 class TutorialScreen extends ConsumerStatefulWidget {
   const TutorialScreen({super.key});
@@ -19,7 +28,6 @@ class TutorialScreenState extends ConsumerState<TutorialScreen> {
 
   @override
   void initState() {
-    fase = 1;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(playerProvider.notifier).tutorialMode();
     });
@@ -29,42 +37,238 @@ class TutorialScreenState extends ConsumerState<TutorialScreen> {
   @override
   Widget build(BuildContext context) {
     final playerState = ref.watch(playerProvider);
+    final backgroundState = ref.watch(backgroundProvider);
     return Scaffold(
-      body: characters.Characters(
-        child: Objects(
-          child: Gestures(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: ParallaxBackground(
-                    imagePath: 'assets/images/level_one/sky.png',
-                    positionLeft: playerState.skyPosition,
-                    speed: playerState.playerSpeed,
-                    height: MediaQuery.of(context).size.height * 0.8,
+      body: InterfaceButtons(
+        child: characters.Characters(
+          child: Stack(
+            children: [
+              Gestures(
+                child: Objects(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: ParallaxBackground(
+                          imagePath: 'assets/images/level_one/sky.png',
+                          positionLeft: backgroundState.backgroundPosition,
+                          speed: playerState.speed,
+                          height: MediaQuery.of(context).size.height * 0.8,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: ParallaxBackground(
+                          imagePath: 'assets/images/level_one/ground.png',
+                          positionLeft: backgroundState.backgroundPosition,
+                          speed: playerState.speed,
+                          height: MediaQuery.of(context).size.height * 0.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                // Ground background always at the bottom
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: ParallaxBackground(
-                    imagePath: 'assets/images/level_one/ground.png',
-                    positionLeft: playerState.groundPosition,
-                    speed: playerState.playerSpeed,
-                    height: MediaQuery.of(context).size.height *
-                        0.3, // Adjust height as needed
+              ),
+              Positioned(
+                bottom: MediaQuery.of(context).size.height * 0.04,
+                left: MediaQuery.of(context).size.width / 2 -
+                    ((MediaQuery.of(context).size.width * 0.6) / 2),
+                child: const _TutorialCard(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TutorialCard extends StatefulWidget {
+  const _TutorialCard();
+
+  @override
+  State<_TutorialCard> createState() => _TutorialCardState();
+}
+
+class _TutorialCardState extends State<_TutorialCard> {
+  late String displayedText = '';
+  late Timer _textTimer;
+  int _currentIndex = 0;
+  int _messageIndex = 0;
+
+  final List<String> messages = [
+    'Hola soy Shadow, y este es mi juego',
+    'te enseñaré lo básico para aprender a moverte',
+    'debes mantener presionado para empezar a moverte',
+    'nos moveremos a la dirección donde presiones',
+    'cuando te encuentres con un enemigo no podrás moverte',
+    'tendrás que matar al enemigo, es muy facil...',
+    'solo presionas encima del enemigo y le harás daño',
+    'consejo: presiona muchas veces para matarlo',
+    'una vez muerto podrás seguir avanzando',
+    'cuando encuentres un cofre pasa por encima y se abrirá',
+    'por ahora solo te da monedas',
+    'pero pronto se irán añadiendo otros objetos',
+    'las monedas sirven para aumentar tus habilidades',
+    'si presionas en skills, podrás subirlas de nivel',
+    'eso sería todo, disfruta el juego',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startTextAnimation();
+  }
+
+  void _startTextAnimation() {
+    _textTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (_currentIndex < messages[_messageIndex].length) {
+        setState(() {
+          displayedText += messages[_messageIndex][_currentIndex];
+          _currentIndex++;
+        });
+      } else {
+        timer.cancel();
+        if (_messageIndex < messages.length - 1) {
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            setState(() {
+              _messageIndex++;
+              displayedText = '';
+              _currentIndex = 0;
+              _startTextAnimation();
+            });
+          });
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _textTimer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10),
+          ),
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.6,
+              minHeight: 74,
+            ),
+            padding: const EdgeInsets.only(),
+            decoration: BoxDecoration(
+              color: AppColors.gray,
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+              border: Border.all(
+                color: AppColors.blue,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 8,
+                  height: 83,
+                  color: AppColors.blue,
+                ),
+                const SizedBox(
+                  width: 11,
+                ),
+                Container(
+                  width: 50,
+                  height: 50,
+                  alignment: Alignment.center,
+                  child: const CustomGif(
+                    images: ['assets/icon.jpg'],
+                    width: 50,
+                    loop: false,
                   ),
+                ),
+                const SizedBox(
+                  width: 9,
+                ),
+                Expanded(
+                  child: Text(
+                    displayedText,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.blue,
+                      height: 20 / 16,
+                      leadingDistribution: TextLeadingDistribution.even,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 40,
                 ),
               ],
             ),
           ),
         ),
-      ),
+        if (_messageIndex == messages.length - 1)
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.04,
+            right: 20,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  AppRouter.go(LobbyRoutes.startGame.path);
+                });
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  gradient: const RadialGradient(
+                    colors: [
+                      Color(0xCCA9A9A9), // dark gray with opacity 0.8
+                      Color(0xFFD3D3D3), // light gray
+                    ],
+                    center: Alignment(-0.3, -0.3),
+                    radius: 0.8,
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x80A9A9A9), // dark gray with opacity 0.5
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: AppColors.blue,
+                  ),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/arrow_back.svg',
+                    width: 25,
+                    height: 25,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFFFFFFFF), // white
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

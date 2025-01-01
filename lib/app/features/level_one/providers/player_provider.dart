@@ -37,7 +37,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     ref.read(dogProvider.notifier).resetData(); // Reinicia las puertas
     ref.read(coinProvider.notifier).resetData(); // Reinicia las monedas
     ref.read(chestProvider.notifier).resetData(); // Reinicia los cofres
-    ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
+    // ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
   }
 
   void tutorialMode() {
@@ -49,7 +49,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     ref.read(dogProvider.notifier).resetData(); // Reinicia las puertas
     ref.read(coinProvider.notifier).resetData(); // Reinicia las monedas
     ref.read(chestProvider.notifier).resetData(); // Reinicia los cofres
-    ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
+    // ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
   }
 
   void _startInactivityTimer() {
@@ -128,12 +128,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     final rightBoundary = state.tutorialMode ? rightLimit : rightLimit / 1.5;
     final distanciaRecorrida = state.moveAmount * state.playerSpeed;
 
-    // Verificar si se puede mover a la derecha
-    if (!ref
-        .read(backgroundProvider.notifier)
-        .canMoveRight(distanciaRecorrida)) {
-      return; // Si no se puede mover, salimos de la función
-    }
+    // // Verificar si se puede mover a la derecha
+    // if (!ref
+    //     .read(backgroundProvider.notifier)
+    //     .canMoveRight(distanciaRecorrida)) {
+    //   return; // Si no se puede mover, salimos de la función
+    // }
 
     if (state.positionX < rightBoundary) {
       // Si no ha llegado al límite derecho, movemos al jugador
@@ -172,12 +172,12 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     resetInactivityTimer();
     final distanciaRecorrida = -state.moveAmount * state.playerSpeed;
 
-    // Verificar si se puede mover a la izquierda
-    if (!ref
-        .read(backgroundProvider.notifier)
-        .canMoveLeft(distanciaRecorrida)) {
-      return; // Si no se puede mover, salimos de la función
-    }
+    // // Verificar si se puede mover a la izquierda
+    // if (!ref
+    //     .read(backgroundProvider.notifier)
+    //     .canMoveLeft(distanciaRecorrida)) {
+    //   return; // Si no se puede mover, salimos de la función
+    // }
 
     if (state.positionX > leftBoundary) {
       // Si no ha llegado al límite izquierdo, movemos al jugador
@@ -232,7 +232,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void checkCollisionsSpiders() {
-    ref.read(spiderProvider.notifier).isAnySpiderNear(state.positionX);
+    // ref.read(spiderProvider.notifier).isAnySpiderNear(state.positionX);
     final spidersIndex = ref.read(spiderProvider);
 
     if (spidersIndex.spiders

@@ -100,7 +100,7 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
       children: [
         Positioned(
           bottom: widget.groundHeight,
-          left: widget.chest.initialPosition,
+          left: widget.chest.xCoords,
           child: CustomGif(
             images: widget.chest.currentState.images,
             width: 65,
@@ -108,13 +108,13 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
           ),
         ),
         // Coins
-        ...coins.where((coin) => !coin.coinCollected).map(
+        ...coins.where((coin) => !coin.isCoinCollected).map(
               (coin) => AnimatedBuilder(
                 animation: _positionAnimation,
                 builder: (context, child) {
                   return Positioned(
                     bottom: _positionAnimation.value,
-                    left: coin.initialPosition,
+                    left: coin.xCoords,
                     child: child!,
                   );
                 },

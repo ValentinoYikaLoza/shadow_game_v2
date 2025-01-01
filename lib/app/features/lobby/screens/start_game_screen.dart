@@ -53,7 +53,7 @@ class StartGameScreen extends StatelessWidget {
               onPressed: () {
                 SnackbarService.show(
                   'Under construction...',
-                  type: SnackbarType.normal,
+                  type: SnackbarType.animated,
                 );
               },
             ),
@@ -80,7 +80,7 @@ class StartGameScreen extends StatelessWidget {
               onPressed: () {
                 SnackbarService.show(
                   'Under construction...',
-                  type: SnackbarType.tutorial,
+                  type: SnackbarType.animated,
                 );
               },
             ),

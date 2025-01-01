@@ -1,9 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final backgroundProvider =
-    StateNotifierProvider<BackgroundNotifier, BackgroundState>((ref) {
-  return BackgroundNotifier(ref);
-});
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
+
+class BackgroundState {
+  final double xCoords;
+  final double backgroundPosition;
+  final double rightLimit;
+
+  BackgroundState({
+    this.xCoords = 20,
+    this.backgroundPosition = 0,
+    this.rightLimit = 5000,
+  });
+
+
+  BackgroundState copyWith({
+    double? xCoords,
+    double? backgroundPosition,
+    double? rightLimit,
+  }) {
+    return BackgroundState(
+      xCoords: xCoords ?? this.xCoords,
+      backgroundPosition: backgroundPosition ?? this.backgroundPosition,
+      rightLimit: rightLimit ?? this.rightLimit,
+    );
+  }
+}
 
 class BackgroundNotifier extends StateNotifier<BackgroundState> {
   BackgroundNotifier(this.ref) : super(BackgroundState());
@@ -14,26 +36,36 @@ class BackgroundNotifier extends StateNotifier<BackgroundState> {
     state = BackgroundState(); // Restaura el estado inicial
   }
 
-  void updateXCoords(double distanciaRecorrida) {
-    final newPosition = state.initialPosition + distanciaRecorrida;
-    state = state.copyWith(
-      initialPosition: newPosition.roundToDouble(),
-    );
+  void updateXCoords(double distance) {
+    if (!canMoveLeft(distance) || !canMoveRight(distance)) {
+      return;
+    }
+
+    final newPosition = state.xCoords + distance;
+
+    if (!canMove()) {
+      state = state.copyWith(backgroundPosition: state.backgroundPosition - distance);
+    }
+
+    state = state.copyWith(xCoords: newPosition);
+
+    // debugPrint('moving: $newPosition');
   }
 
-  // Método para verificar si se puede mover a la izquierda
-  bool canMoveLeft(double distanciaRecorrida) {
-    final newPosition = state.initialPosition + distanciaRecorrida;
-
-    // Permite el movimiento solo si la nueva posición es mayor que 0
-    return newPosition > 0;
+  bool canMove() {
+    final playerState = ref.read(playerProvider);
+    return playerState.isMoving;
   }
 
-  // Método para verificar si se puede mover a la derecha
-  bool canMoveRight(double distanciaRecorrida) {
-    final newPosition = state.initialPosition + distanciaRecorrida;
+  bool canMoveLeft(double distance) {
+    final newPosition = state.xCoords + distance;
 
-    // Permite el movimiento solo si la nueva posición no excede el límite derecho
+    return newPosition > 20;
+  }
+
+  bool canMoveRight(double distance) {
+    final newPosition = state.xCoords +  distance;
+
     return newPosition < state.rightLimit;
   }
 
@@ -44,22 +76,7 @@ class BackgroundNotifier extends StateNotifier<BackgroundState> {
   }
 }
 
-class BackgroundState {
-  final double initialPosition;
-  final double rightLimit;
-
-  BackgroundState({
-    this.initialPosition = 0,
-    this.rightLimit = 5000,
-  });
-
-  BackgroundState copyWith({
-    double? initialPosition,
-    double? rightLimit,
-  }) {
-    return BackgroundState(
-      initialPosition: initialPosition ?? this.initialPosition,
-      rightLimit: rightLimit ?? this.rightLimit,
-    );
-  }
-}
+final backgroundProvider =
+    StateNotifierProvider<BackgroundNotifier, BackgroundState>((ref) {
+  return BackgroundNotifier(ref);
+});

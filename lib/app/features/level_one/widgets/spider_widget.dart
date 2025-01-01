@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 
@@ -66,7 +66,7 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
               ? groundHeight - 20
               : groundHeight - 5
           : groundHeight - 2,
-      left: widget.spider.initialPosition,
+      left: widget.spider.xCoords,
       child: GestureDetector(
         onLongPressDown: (_) {
           setState(() {
@@ -77,12 +77,12 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
         },
         onLongPressEnd: (_) {
           setState(() {
-            ref.read(playerProvider.notifier).changeState(PlayerStates.stay);
+            ref.read(playerProvider.notifier).updateState(PlayerStates.stay);
           });
         },
         onTapUp: (_) {
           setState(() {
-            ref.read(playerProvider.notifier).changeState(PlayerStates.stay);
+            ref.read(playerProvider.notifier).updateState(PlayerStates.stay);
           });
         },
         child: Opacity(
@@ -97,7 +97,7 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
                 setState(() {
                   ref
                       .read(playerProvider.notifier)
-                      .takeDamage(widget.spider.attackDamage);
+                      .takeDamage(widget.spider.damage);
                 });
               }
             },

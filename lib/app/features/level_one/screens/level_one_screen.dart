@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
+// import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/gestures.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/interface_buttons.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/objects.dart';
@@ -28,13 +30,14 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
   @override
   Widget build(BuildContext context) {
     final playerState = ref.watch(playerProvider);
+    final backgroundState = ref.watch(backgroundProvider);
     return Scaffold(
       body: SkillProvider(
         child: InterfaceButtons(
           child: characters.Characters(
             //porque no permite poner el nombre Characters por si solo porque ya hay otra clase con ese nombre
-            child: Objects(
-              child: Gestures(
+            child: Gestures(
+              child: Objects(
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -44,8 +47,8 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
                       right: 0,
                       child: ParallaxBackground(
                         imagePath: 'assets/images/level_one/sky.png',
-                        positionLeft: playerState.skyPosition,
-                        speed: playerState.playerSpeed,
+                        positionLeft: backgroundState.backgroundPosition,
+                        speed: playerState.speed,
                         height: MediaQuery.of(context).size.height * 0.8,
                       ),
                     ),
@@ -56,8 +59,8 @@ class LevelOneScreenState extends ConsumerState<LevelOneScreen> {
                       right: 0,
                       child: ParallaxBackground(
                         imagePath: 'assets/images/level_one/ground.png',
-                        positionLeft: playerState.groundPosition,
-                        speed: playerState.playerSpeed,
+                        positionLeft: backgroundState.backgroundPosition,
+                        speed: playerState.speed,
                         height: MediaQuery.of(context).size.height *
                             0.3, // Adjust height as needed
                       ),

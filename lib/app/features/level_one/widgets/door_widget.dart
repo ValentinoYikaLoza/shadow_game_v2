@@ -15,7 +15,7 @@ class DoorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned(
       bottom: groundHeight,
-      left: door.initialPosition,
+      left: door.xCoords,
       child: Column(
         children: [
           door.doorType == DoorType.start

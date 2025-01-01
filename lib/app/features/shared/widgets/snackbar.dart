@@ -6,7 +6,7 @@ import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 
 enum SnackbarType {
   normal,
-  tutorial, // Para el Snackbar que mostrará la barra de descarga
+  animated, // Para el Snackbar que mostrará la barra de descarga
 }
 
 final GlobalKey<_SnackbarContentState> _snackbarKey =
@@ -76,7 +76,7 @@ class _SnackbarContentState extends State<_SnackbarContent> {
       snackbars.add(newSnackbar);
     });
 
-    if (type == SnackbarType.normal || type == SnackbarType.tutorial) {
+    if (type == SnackbarType.normal || type == SnackbarType.animated) {
       Future.delayed(const Duration(seconds: 4), () {
         removeSnackbar(newSnackbar);
       });
@@ -116,8 +116,8 @@ class _SnackbarContentState extends State<_SnackbarContent> {
                       removeSnackbar(snackbar);
                     },
                   );
-                } else if (snackbar.type == SnackbarType.tutorial) {
-                  return _TutorialSnackbar(
+                } else if (snackbar.type == SnackbarType.animated) {
+                  return _AnimatedSnackbar(
                     message: snackbar.message,
                     onClose: () {
                       removeSnackbar(snackbar);
@@ -227,8 +227,8 @@ class _CustomSnackbar extends StatelessWidget {
   }
 }
 
-class _TutorialSnackbar extends StatefulWidget {
-  const _TutorialSnackbar({
+class _AnimatedSnackbar extends StatefulWidget {
+  const _AnimatedSnackbar({
     required this.message,
     required this.onClose,
   });
@@ -237,10 +237,10 @@ class _TutorialSnackbar extends StatefulWidget {
   final void Function() onClose;
 
   @override
-  State<_TutorialSnackbar> createState() => _TutorialSnackbarState();
+  State<_AnimatedSnackbar> createState() => _AnimatedSnackbarState();
 }
 
-class _TutorialSnackbarState extends State<_TutorialSnackbar> {
+class _AnimatedSnackbarState extends State<_AnimatedSnackbar> {
   late String displayedText = '';
   late Timer _textTimer;
   int _currentIndex = 0;

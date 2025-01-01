@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+// import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 
 final dogProvider = StateNotifierProvider<DogNotifier, DogState>((ref) {
   return DogNotifier(ref);

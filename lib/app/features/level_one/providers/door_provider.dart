@@ -1,82 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 
-final doorProvider = StateNotifierProvider<DoorNotifier, DoorState>((ref) {
-  return DoorNotifier(ref);
-});
-
-class DoorNotifier extends StateNotifier<DoorState> {
-  DoorNotifier(this.ref) : super(DoorState());
-  final Ref ref;
-
-  /// Restablece el estado de las arañas
-  void resetData() {
-    state = DoorState(); // Restaura el estado inicial
-  }
-
-  void addDoor(
-      {double initialPosition = 100, DoorType doorType = DoorType.start}) {
-    // print('cofre en x:$initialPosition');
-    state = state.copyWith(
-      doors: [
-        ...state.doors,
-        Door(
-          initialPosition: initialPosition,
-          doorType: doorType,
-        )
-      ],
-    );
-  }
-
-  void updateXCoords(double distanciaRecorrida) {
-    state = state.copyWith(
-        doors: state.doors.map((door) {
-      final newPosition = door.initialPosition + distanciaRecorrida;
-
-      return door.copyWith(
-        initialPosition: newPosition.roundToDouble(),
-      );
-    }).toList());
-  }
-
-  bool isPlayerColliding(double playerX, Door door) {
-    // Define el área de colisión del objeto
-    final objectLeft = door.initialPosition - (door.width / 2);
-    final objectRight = door.initialPosition + (door.width / 2);
-
-    // Define el área de colisión del jugador
-    // Asumimos que el jugador tiene un área de colisión más pequeña que su sprite
-    const playerWidth = 50.0; // Ajusta según el tamaño real del jugador
-    final playerLeft = playerX - (playerWidth / 2);
-    final playerRight = playerX + (playerWidth / 2);
-
-    // Verifica si hay superposición en ambos ejes
-    bool colisionHorizontal =
-        playerRight >= objectLeft && playerLeft <= objectRight;
-
-    return colisionHorizontal;
-  }
-
-  void isAnyDoorNear(double playerX) {
-    state = state.copyWith(
-      doors: state.doors.map(
-        (door) {
-          if (isPlayerColliding(playerX, door)) {
-            // followPlayer(spider);
-            return door.copyWith(
-              currentState: DoorStates.open,
-            );
-          } else {
-            return door.copyWith(
-              currentState: DoorStates.close,
-            );
-          }
-        },
-      ).toList(),
-    );
-  }
-}
+enum DoorType { start, finish }
 
 class DoorState {
   final List<Door> doors;
@@ -95,26 +22,26 @@ class DoorState {
 }
 
 class Door {
-  final double initialPosition;
+  final double xCoords;
   final DoorStates currentState;
   final DoorType doorType;
   final double width;
 
   Door({
-    this.initialPosition = 100,
+    this.xCoords = 100,
     this.currentState = DoorStates.close,
     this.doorType = DoorType.start,
-    this.width = 100,
+    this.width = 120,
   });
 
   Door copyWith({
-    double? initialPosition,
+    double? xCoords,
     DoorStates? currentState,
     DoorType? doorType,
     double? width,
   }) {
     return Door(
-      initialPosition: initialPosition ?? this.initialPosition,
+      xCoords: xCoords ?? this.xCoords,
       currentState: currentState ?? this.currentState,
       doorType: doorType ?? this.doorType,
       width: width ?? this.width,
@@ -122,7 +49,84 @@ class Door {
   }
 }
 
-enum DoorType {
-  start,
-  finish,
+class DoorNotifier extends StateNotifier<DoorState> {
+  DoorNotifier(this.ref) : super(DoorState());
+  final Ref ref;
+
+  /// Restablece el estado de las arañas
+  void resetData() {
+    state = DoorState(); // Restaura el estado inicial
+  }
+
+  void addDoor(
+      {double xCoords = 100, DoorType doorType = DoorType.start}) {
+    state = state.copyWith(
+      doors: [
+        ...state.doors,
+        Door(xCoords: xCoords, doorType: doorType)
+      ],
+    );
+  }
+
+  void updateXCoords(double distance) {
+    state = state.copyWith(
+        doors: state.doors.map((door) {
+      final newPosition = door.xCoords - distance;
+
+      if (canMove()) return door;
+
+      if (!canMoveLeft(distance) || !canMoveRight(distance)) return door;
+
+      return door.copyWith(
+        xCoords: newPosition,
+      );
+    }).toList());
+  }
+
+  bool canMove() {
+    final playerState = ref.read(playerProvider);
+    return playerState.isMoving;
+  }
+
+  bool canMoveLeft(double distance) {
+    final backgroundState = ref.read(backgroundProvider.notifier);
+    return backgroundState.canMoveLeft(distance);
+  }
+
+  bool canMoveRight(double distance) {
+    final backgroundState = ref.read(backgroundProvider.notifier);
+    return backgroundState.canMoveRight(distance);
+  }
+
+  bool isPlayerColliding(double playerX, Door door) {
+    final leftBoundary = door.xCoords;
+    final rightBoundary = door.xCoords + door.width;
+
+    const playerWidth = 50.0;
+    final playerLeftBoundary = playerX;
+    final playerRightBoundary = playerX + (playerWidth / 2);
+
+    bool colisionHorizontal = playerRightBoundary >= leftBoundary &&
+        playerLeftBoundary <= rightBoundary;
+
+    return colisionHorizontal;
+  }
+
+  void isAnyDoorNear(double playerX) {
+    state = state.copyWith(
+      doors: state.doors.map(
+        (door) {
+          return door.copyWith(
+            currentState: isPlayerColliding(playerX, door)
+                ? DoorStates.open
+                : DoorStates.close,
+          );
+        },
+      ).toList(),
+    );
+  }
 }
+
+final doorProvider = StateNotifierProvider<DoorNotifier, DoorState>((ref) {
+  return DoorNotifier(ref);
+});

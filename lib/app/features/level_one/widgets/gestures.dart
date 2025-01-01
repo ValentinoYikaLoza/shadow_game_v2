@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 
 class Gestures extends ConsumerStatefulWidget {
   final Widget child;
@@ -12,10 +14,14 @@ class Gestures extends ConsumerStatefulWidget {
 }
 
 class GesturesState extends ConsumerState<Gestures> {
+  Timer? _leftTimer;
+  Timer? _rightTimer;
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final playerNotifier = ref.read(playerProvider.notifier);
+    final playerState = ref.read(playerProvider);
 
     return Stack(
       children: [
@@ -24,16 +30,36 @@ class GesturesState extends ConsumerState<Gestures> {
           children: [
             Expanded(
               child: GestureDetector(
-                onLongPressMoveUpdate: (_) => playerNotifier.moveLeft(),
-                onLongPressEnd: (_) => playerNotifier.stopMoving(),
+                onLongPressStart: (_) {
+                  _leftTimer =
+                      Timer.periodic(const Duration(milliseconds: 5), (_) {
+                    playerNotifier.moveLeft();
+                  });
+                },
+                // onLongPressMoveUpdate: (_) => playerNotifier.moveLeft(),
+                onLongPressEnd: (_) {
+                  _leftTimer?.cancel();
+                  playerNotifier.stopMovement();
+                },
                 child: Container(color: Colors.transparent),
               ),
             ),
             Expanded(
               child: GestureDetector(
-                onLongPressMoveUpdate: (_) =>
-                    playerNotifier.moveRight(screenWidth - 70),
-                onLongPressEnd: (_) => playerNotifier.stopMoving(),
+                onLongPressStart: (_) {
+                  _rightTimer =
+                      Timer.periodic(const Duration(milliseconds: 5), (_) {
+                    playerNotifier.moveRight(
+                        playerState.currentStatus == PlayerStatus.tutorial
+                            ? screenWidth - 100
+                            : screenWidth / 1.5);
+                  });
+                },
+                // onLongPressMoveUpdate: (_) => playerNotifier.moveRight(screenWidth / 1.5),
+                onLongPressEnd: (_) {
+                  _rightTimer?.cancel();
+                  playerNotifier.stopMovement();
+                },
                 child: Container(color: Colors.transparent),
               ),
             ),
