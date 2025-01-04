@@ -78,7 +78,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
   /// Restablece el estado de las arañas
   void resetData(bool isTutorialMode) {
-    state = isTutorialMode ? SpiderState(maxSpiders: 1) : SpiderState(maxSpiders: 2);
+    state = isTutorialMode ? SpiderState(maxSpiders: 1) : SpiderState();
   }
 
   void addSpider({double xCoords = 500}) {

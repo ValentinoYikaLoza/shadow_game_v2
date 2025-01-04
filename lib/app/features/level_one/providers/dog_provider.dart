@@ -120,7 +120,7 @@ class DogNotifier extends StateNotifier<DogState> {
 
     _goAwayTimer?.cancel();
     _goAwayTimer = Timer.periodic(const Duration(milliseconds: 5), (timer) {
-      if (state.xCoords >= 100) {
+      if (playerX - state.xCoords <= 300) {
         _moveAway(distance);
       } else {
         _stopMovingAway(timer);
