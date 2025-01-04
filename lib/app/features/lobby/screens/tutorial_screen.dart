@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shadow_game_v2/app/config/constants/app_colors.dart';
 import 'package:shadow_game_v2/app/config/router/app_router.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/gestures.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/interface_buttons.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/objects.dart';

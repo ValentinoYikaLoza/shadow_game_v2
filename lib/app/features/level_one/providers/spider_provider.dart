@@ -6,7 +6,7 @@ import 'package:shadow_game_v2/app/features/level_one/providers/background_provi
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/dog_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/snackbar.dart';
 
 class SpiderState {
