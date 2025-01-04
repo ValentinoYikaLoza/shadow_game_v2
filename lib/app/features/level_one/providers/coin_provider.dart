@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
-
-// import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/models/game_object.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 
 class CoinState {
@@ -20,19 +18,18 @@ class CoinState {
   }
 }
 
-class Coin {
-  final double xCoords;
+class Coin extends GameObject {
   final bool isCoinCollected;
   final double coinValue;
-  final double width;
 
   Coin({
-    this.xCoords = 600,
-    this.isCoinCollected = false,
+    super.xCoords = 600,
+    super.width = 5,
     this.coinValue = 1,
-    this.width = 5,
+    this.isCoinCollected = false,
   });
 
+  @override
   Coin copyWith({
     double? xCoords,
     bool? isCoinCollected,
@@ -48,13 +45,15 @@ class Coin {
   }
 }
 
-class CoinNotifier extends StateNotifier<CoinState> {
+class CoinNotifier extends StateNotifier<CoinState>
+    with CollisionMixin<CoinState> {
   CoinNotifier(this.ref) : super(CoinState());
+  
+  @override
   final Ref ref;
 
-  /// Restablece el estado de las arañas
   void resetData() {
-    state = CoinState(); // Restaura el estado inicial
+    state = CoinState();
   }
 
   void addCoin({double initialPosition = 600, double coinValue = 1}) {
@@ -69,7 +68,6 @@ class CoinNotifier extends StateNotifier<CoinState> {
   void updateXCoords(double distance) {
     state = state.copyWith(
         coins: state.coins.map((coin) {
-      
       final newPosition = coin.xCoords - distance;
 
       if (canMove()) return coin;
@@ -80,35 +78,6 @@ class CoinNotifier extends StateNotifier<CoinState> {
         xCoords: newPosition,
       );
     }).toList());
-  }
-
-  bool canMove() {
-    final playerState = ref.read(playerProvider);
-    return playerState.isBetweenTheLimits;
-  }
-
-  bool canMoveLeft(double distance) {
-    final backgroundState = ref.read(backgroundProvider.notifier);
-    return backgroundState.canMoveLeft(distance);
-  }
-
-  bool canMoveRight(double distance) {
-    final backgroundState = ref.read(backgroundProvider.notifier);
-    return backgroundState.canMoveRight(distance);
-  }
-
-  bool isPlayerColliding(double playerX, Coin coin) {
-    final leftBoundary = coin.xCoords;
-    final rightBoundary = coin.xCoords + coin.width;
-
-    const playerWidth = 50.0;
-    final playerLeftBoundary = playerX;
-    final playerRightBoundary = playerX + (playerWidth / 2);
-
-    bool colisionHorizontal = playerRightBoundary >= leftBoundary &&
-        playerLeftBoundary <= rightBoundary;
-
-    return colisionHorizontal;
   }
 
   void isAnyCoinNear(double playerX) {

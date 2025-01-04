@@ -22,9 +22,7 @@ class _LifebarState extends State<Lifebar> {
     if (widget.totalHearts != oldWidget.totalHearts || 
         widget.fullHearts != oldWidget.fullHearts) {
       // Forzar una reconstrucción del widget
-      setState(() {
-        print(widget.totalHearts);
-      });
+      setState(() {});
     }
   }
 

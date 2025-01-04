@@ -10,7 +10,7 @@ class CoinWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomGif(
-      images: CoinStates.waiting.images,
+      images: CoinAnimations.waiting.state.images,
       width: 28,
       loop: true, // Si la moneda necesita animación constante
     );

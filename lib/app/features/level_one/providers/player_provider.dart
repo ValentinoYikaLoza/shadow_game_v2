@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/config/router/app_router.dart';
 
@@ -26,7 +24,7 @@ class PlayerState {
   final double coins;
   final double speed;
   final PlayerStatus currentStatus;
-  final PlayerStates currentState;
+  final PlayerAnimations currentState;
   final Directions currentDirection;
   final bool isBetweenTheLimits;
   final bool isJumping;
@@ -35,7 +33,7 @@ class PlayerState {
     required this.maxLives,
     required this.currentLives,
     required this.currentStatus,
-    this.currentState = PlayerStates.stay,
+    this.currentState = PlayerAnimations.stay,
     this.currentDirection = Directions.right,
     this.xCoords = 20.0,
     this.yCoords = 0.0,
@@ -57,7 +55,7 @@ class PlayerState {
     double? coins,
     double? speed,
     PlayerStatus? currentStatus,
-    PlayerStates? currentState,
+    PlayerAnimations? currentState,
     Directions? currentDirection,
     bool? isBetweenTheLimits,
     bool? isJumping,
@@ -161,7 +159,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     state = state.copyWith(currentStatus: newStatus);
   }
 
-  void updateState(PlayerStates newState) {
+  void updateState(PlayerAnimations newState) {
     state = state.copyWith(currentState: newState);
   }
 
@@ -190,7 +188,6 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   void takeDamage(double damage) {
     if (state.currentStatus == PlayerStatus.tutorial) return;
     final random = Random();
-    debugPrint(random.toString());
     if (random.nextDouble() > state.damageResistance) {
       final newLives = state.currentLives - damage;
       updateLives(newLives);
@@ -207,7 +204,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
 
   void attack() {
     resetInactivityTimer();
-    updateState(PlayerStates.attack);
+    updateState(PlayerAnimations.attack);
     ref.read(spiderProvider.notifier).takeDamage(state.damage);
   }
 
@@ -217,7 +214,7 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
 
     state = state.copyWith(
       isJumping: true,
-      currentState: PlayerStates.jump,
+      currentState: PlayerAnimations.jump,
     );
 
     _jumpTimer?.cancel();
@@ -248,23 +245,23 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
     resetInactivityTimer();
     state = state.copyWith(
       isJumping: false,
-      currentState: PlayerStates.stay,
+      currentState: PlayerAnimations.stay,
     );
   }
 
   void dance() {
-    updateState(PlayerStates.dance);
+    updateState(PlayerAnimations.dance);
   }
 
   void move() {
     resetInactivityTimer();
     ref.read(dogProvider.notifier).followPlayer(state.xCoords);
-    updateState(PlayerStates.walk);
+    updateState(PlayerAnimations.walk);
   }
 
   void stopMovement() {
     resetInactivityTimer();
-    updateState(PlayerStates.stay);
+    updateState(PlayerAnimations.stay);
   }
 
   void moveLeft() {
@@ -332,8 +329,8 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
 
     final spiders = ref.read(spiderProvider).spiders;
     final isSpiderNear = spiders.any((spider) =>
-        spider.currentState == SpiderStates.walk ||
-        spider.currentState == SpiderStates.attack);
+        spider.currentState == SpiderAnimations.walk ||
+        spider.currentState == SpiderAnimations.attack);
 
     _updatePlayerSpeed(isSpiderNear);
     _updateDogBehavior(isSpiderNear);

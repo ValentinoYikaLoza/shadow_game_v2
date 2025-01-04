@@ -22,38 +22,44 @@ class SpiderWidget extends ConsumerStatefulWidget {
 
 class SpiderWidgetState extends ConsumerState<SpiderWidget> {
   Timer? dieTimer;
-  double opacity = 1;
+  double opacity = 1.0;
 
-  initOpacity() {
+  void initOpacity() {
     Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        dieTimer = Timer.periodic(
-          const Duration(milliseconds: 50),
-          (timer) {
-            final newOpacity = opacity - 0.1;
-            if (newOpacity <= 0) {
-              setState(() {
-                opacity = 0;
-                dieTimer!.cancel();
-              });
-            } else {
-              setState(() {
-                opacity = newOpacity;
-              });
+      if (!mounted) return;
+      dieTimer?.cancel();
+      dieTimer = Timer.periodic(
+        const Duration(milliseconds: 50),
+        (timer) {
+          if (!mounted) {
+            dieTimer?.cancel();
+            return;
+          }
+          setState(() {
+            opacity = (opacity - 0.1).clamp(0.0, 1.0);
+            if (opacity == 0) {
+              dieTimer?.cancel();
             }
-          },
-        );
-      });
+          });
+        },
+      );
     });
   }
 
   @override
   void didUpdateWidget(covariant SpiderWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.spider.currentState == SpiderStates.die &&
-        oldWidget.spider.currentState != SpiderStates.die) {
+    if (widget.spider.currentState == SpiderAnimations.die &&
+        oldWidget.spider.currentState != SpiderAnimations.die) {
       initOpacity();
     }
+  }
+
+  @override
+  void dispose() {
+    dieTimer?.cancel();
+    dieTimer = null;
+    super.dispose();
   }
 
   @override
@@ -62,43 +68,35 @@ class SpiderWidgetState extends ConsumerState<SpiderWidget> {
     final groundHeight = screenHeight * 0.3;
     return Positioned(
       bottom: widget.isBoss
-          ? widget.spider.currentState == SpiderStates.die
+          ? widget.spider.currentState == SpiderAnimations.die
               ? groundHeight - 20
               : groundHeight - 5
           : groundHeight - 2,
       left: widget.spider.xCoords,
       child: GestureDetector(
         onLongPressDown: (_) {
-          setState(() {
-            widget.spider.currentState == SpiderStates.attack
-                ? ref.read(playerProvider.notifier).attack()
-                : null;
-          });
+          widget.spider.currentState == SpiderAnimations.attack
+              ? ref.read(playerProvider.notifier).attack()
+              : null;
         },
         onLongPressEnd: (_) {
-          setState(() {
-            ref.read(playerProvider.notifier).updateState(PlayerStates.stay);
-          });
+          ref.read(playerProvider.notifier).updateState(PlayerAnimations.stay);
         },
         onTapUp: (_) {
-          setState(() {
-            ref.read(playerProvider.notifier).updateState(PlayerStates.stay);
-          });
+          ref.read(playerProvider.notifier).updateState(PlayerAnimations.stay);
         },
         child: Opacity(
           opacity: opacity,
           child: CustomGif(
-            images: widget.spider.currentState.images,
+            images: widget.spider.currentState.state.images,
             width: widget.isBoss ? 475 : 95,
-            loop: widget.spider.currentState.loop,
+            loop: widget.spider.currentState.state.loop,
             flip: widget.spider.currentDirection != Directions.left,
             onComplete: () {
-              if (widget.spider.currentState == SpiderStates.attack) {
-                setState(() {
-                  ref
-                      .read(playerProvider.notifier)
-                      .takeDamage(widget.spider.damage);
-                });
+              if (widget.spider.currentState == SpiderAnimations.attack) {
+                ref
+                    .read(playerProvider.notifier)
+                    .takeDamage(widget.spider.damage);
               }
             },
           ),

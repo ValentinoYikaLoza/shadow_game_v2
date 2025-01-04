@@ -59,7 +59,7 @@ class InterfaceButtons extends ConsumerWidget {
               ),
               const SizedBox(width: 10),
               CustomGif(
-                images: CoinStates.looping.images,
+                images: CoinAnimations.looping.state.images,
                 width: 26,
                 loop: true,
               ),

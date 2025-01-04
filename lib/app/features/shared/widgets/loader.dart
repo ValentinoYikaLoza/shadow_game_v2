@@ -81,12 +81,12 @@ class _LoaderContentState extends State<_LoaderContent> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomGif(
-                        images: ShadowStates.walk.images,
+                        images: ShadowAnimations.walk.state.images,
                         width: 70,
                         loop: true,
                       ),
                       CustomGif(
-                        images: PlayerStates.walk.images,
+                        images: PlayerAnimations.walk.state.images,
                         width: 50,
                         loop: true,
                       ),

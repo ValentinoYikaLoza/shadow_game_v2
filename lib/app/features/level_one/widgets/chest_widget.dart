@@ -69,8 +69,8 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
   void didUpdateWidget(covariant ChestWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.chest.currentState == ChestStates.open &&
-        oldWidget.chest.currentState != ChestStates.open) {
+    if (widget.chest.currentState == ChestSprites.open &&
+        oldWidget.chest.currentState != ChestSprites.open) {
       setState(() {
         isJumping = true;
         _jumpController.forward(from: 0);
@@ -102,7 +102,7 @@ class ChestWidgetState extends ConsumerState<ChestWidget>
           bottom: widget.groundHeight,
           left: widget.chest.xCoords,
           child: CustomGif(
-            images: widget.chest.currentState.images,
+            images: widget.chest.currentState.state.images,
             width: 65,
             loop: false,
           ),

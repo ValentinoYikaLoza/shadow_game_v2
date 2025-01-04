@@ -31,7 +31,7 @@ class SpiderState {
 
 class Spider {
   final double xCoords;
-  final SpiderStates currentState;
+  final SpiderAnimations currentState;
   final Directions currentDirection;
   final double width;
   final double currentLives;
@@ -40,7 +40,7 @@ class Spider {
 
   Spider({
     this.xCoords = 500,
-    this.currentState = SpiderStates.stay,
+    this.currentState = SpiderAnimations.stay,
     this.currentDirection = Directions.left,
     this.width = 300,
     this.currentLives = 5,
@@ -50,7 +50,7 @@ class Spider {
 
   Spider copyWith({
     double? xCoords,
-    SpiderStates? currentState,
+    SpiderAnimations? currentState,
     Directions? currentDirection,
     double? width,
     double? currentLives,
@@ -78,7 +78,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
   /// Restablece el estado de las arañas
   void resetData(bool isTutorialMode) {
-    state = isTutorialMode ? SpiderState(maxSpiders: 1) : SpiderState();
+    state = isTutorialMode ? SpiderState(maxSpiders: 1) : SpiderState(maxSpiders: 2);
   }
 
   void addSpider({double xCoords = 500}) {
@@ -150,7 +150,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
       final playerState = ref.read(playerProvider);
       state = state.copyWith(
         spiders: state.spiders.map((spider) {
-          if (spider.currentState == SpiderStates.walk) {
+          if (spider.currentState == SpiderAnimations.walk) {
             return _moveSpiderTowardsPlayer(spider, playerState.xCoords);
           }
           return spider;
@@ -163,7 +163,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     final isPlayerNear = spider.xCoords < playerX + 50;
 
     return spider.copyWith(
-      currentState: isPlayerNear ? SpiderStates.attack : spider.currentState,
+      currentState: isPlayerNear ? SpiderAnimations.attack : spider.currentState,
       xCoords: isPlayerNear ? spider.xCoords : spider.xCoords - 5,
     );
   }
@@ -175,9 +175,9 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
           if (!isPlayerColliding(playerX, spider)) return spider;
 
           return spider.copyWith(
-            currentState: spider.currentState == SpiderStates.die
-                ? SpiderStates.die
-                : SpiderStates.walk,
+            currentState: spider.currentState == SpiderAnimations.die
+                ? SpiderAnimations.die
+                : SpiderAnimations.walk,
             currentDirection: Directions.left,
           );
         },
@@ -189,7 +189,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     final backgroundPosition = ref.read(backgroundProvider).xCoords;
     state = state.copyWith(
       spiders: state.spiders.map((spider) {
-        if (spider.currentState != SpiderStates.attack) return spider;
+        if (spider.currentState != SpiderAnimations.attack) return spider;
 
         final newHealth = spider.currentLives - damage;
         final spiderIndex = state.spiders.indexOf(spider);
@@ -200,7 +200,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
         return spider.copyWith(
           currentLives: newHealth,
-          currentState: newHealth <= 0 ? SpiderStates.die : SpiderStates.attack,
+          currentState: newHealth <= 0 ? SpiderAnimations.die : SpiderAnimations.attack,
         );
       }).toList(),
     );

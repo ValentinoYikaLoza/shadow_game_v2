@@ -48,8 +48,6 @@ class BackgroundNotifier extends StateNotifier<BackgroundState> {
     }
 
     state = state.copyWith(xCoords: newPosition);
-
-    // debugPrint('moving: $newPosition');
   }
 
   bool canMove() {

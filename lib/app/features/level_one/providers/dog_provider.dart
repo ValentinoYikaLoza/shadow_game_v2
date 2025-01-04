@@ -7,14 +7,14 @@ class DogState {
   final double xCoords;
   final double width;
   final double speed;
-  final ShadowStates currentState;
+  final ShadowAnimations currentState;
   final Directions currentDirection;
 
   DogState({
     this.xCoords = 100,
     this.width = 80,
     this.speed = 0.2,
-    this.currentState = ShadowStates.sit,
+    this.currentState = ShadowAnimations.sit,
     this.currentDirection = Directions.left,
   });
 
@@ -22,7 +22,7 @@ class DogState {
     double? xCoords,
     double? width,
     double? speed,
-    ShadowStates? currentState,
+    ShadowAnimations? currentState,
     Directions? currentDirection,
   }) {
     return DogState(
@@ -49,7 +49,7 @@ class DogNotifier extends StateNotifier<DogState> {
     state = DogState();
   }
 
-  void updateState(ShadowStates currentState) {
+  void updateState(ShadowAnimations currentState) {
     state = state.copyWith(currentState: currentState);
   }
 
@@ -63,13 +63,13 @@ class DogNotifier extends StateNotifier<DogState> {
   }
 
   void stopMovement() {
-    updateState(ShadowStates.sit);
+    updateState(ShadowAnimations.sit);
   }
 
   bool isPlayerBetweenTheLimitsAndWalking() {
     final playerState = ref.read(playerProvider);
     return playerState.isBetweenTheLimits &&
-        playerState.currentState == PlayerStates.walk;
+        playerState.currentState == PlayerAnimations.walk;
   }
 
   bool isPlayerColliding(double playerX, DogState dog) {
@@ -96,14 +96,14 @@ class DogNotifier extends StateNotifier<DogState> {
 
   void handlePlayerMoving() {
     final distance = deltaX * state.speed;
-    updateState(ShadowStates.walk);
+    updateState(ShadowAnimations.walk);
     move(distance);
   }
 
   void handlePlayerNear(double playerX) {
     updateState(isPlayerBetweenTheLimitsAndWalking()
-        ? ShadowStates.sit
-        : ShadowStates.walk);
+        ? ShadowAnimations.sit
+        : ShadowAnimations.walk);
     updateDirection(
         playerX > state.xCoords ? Directions.right : Directions.left);
   }
@@ -131,13 +131,13 @@ class DogNotifier extends StateNotifier<DogState> {
   void _moveAway(double distance) {
     updateXCoords(distance);
     updateDirection(Directions.left);
-    updateState(ShadowStates.walk);
+    updateState(ShadowAnimations.walk);
   }
 
   void _stopMovingAway(Timer timer) {
     timer.cancel();
     updateDirection(Directions.right);
-    updateState(ShadowStates.bark);
+    updateState(ShadowAnimations.bark);
   }
 
   void goBackToThePlayer(double playerX) {
@@ -155,12 +155,12 @@ class DogNotifier extends StateNotifier<DogState> {
 
   void _moveBack(double distance) {
     updateXCoords(-distance);
-    updateState(ShadowStates.walk);
+    updateState(ShadowAnimations.walk);
   }
 
   void _stopMovingBack(Timer timer) {
     timer.cancel();
-    updateState(ShadowStates.sit);
+    updateState(ShadowAnimations.sit);
   }
 }
 
