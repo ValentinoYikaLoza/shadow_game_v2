@@ -10,7 +10,7 @@ class BackgroundState {
   BackgroundState({
     this.xCoords = 20,
     this.backgroundPosition = 0,
-    this.rightLimit = 5000,
+    this.rightLimit = 10000,
   });
 
 

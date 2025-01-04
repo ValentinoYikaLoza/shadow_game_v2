@@ -163,7 +163,8 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
     final isPlayerNear = spider.xCoords < playerX + 50;
 
     return spider.copyWith(
-      currentState: isPlayerNear ? SpiderAnimations.attack : spider.currentState,
+      currentState:
+          isPlayerNear ? SpiderAnimations.attack : spider.currentState,
       xCoords: isPlayerNear ? spider.xCoords : spider.xCoords - 5,
     );
   }
@@ -200,7 +201,8 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
         return spider.copyWith(
           currentLives: newHealth,
-          currentState: newHealth <= 0 ? SpiderAnimations.die : SpiderAnimations.attack,
+          currentState:
+              newHealth <= 0 ? SpiderAnimations.die : SpiderAnimations.attack,
         );
       }).toList(),
     );
@@ -218,7 +220,6 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
   void _handleLastSpiderDeath(Spider spider, double backgroundPosition) {
     Future.delayed(const Duration(seconds: 2), () {
       state = SpiderState(); // Clear all spiders
-
       ref.read(chestProvider.notifier).addChest(
             xCoords: spider.xCoords + 50,
             coinValue: 5,
