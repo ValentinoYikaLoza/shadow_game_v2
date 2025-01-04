@@ -1,111 +1,251 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:shadow_game_v2/app/config/router/app_router.dart';
+
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/coin_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/dog_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/lobby/routes/lobby_routes.dart';
 
-final playerProvider =
-    StateNotifierProvider<PlayerNotifier, PlayerState>((ref) {
-  return PlayerNotifier(ref);
-});
+enum PlayerStatus { playing, tutorial, gameOver }
+
+class PlayerState {
+  final double xCoords;
+  final double yCoords;
+  final double currentLives;
+  final double maxLives;
+  final double damage;
+  final double damageResistance;
+  final double coins;
+  final double speed;
+  final PlayerStatus currentStatus;
+  final PlayerStates currentState;
+  final Directions currentDirection;
+  final bool isBetweenTheLimits;
+  final bool isJumping;
+
+  PlayerState({
+    required this.maxLives,
+    required this.currentLives,
+    required this.currentStatus,
+    this.currentState = PlayerStates.stay,
+    this.currentDirection = Directions.right,
+    this.xCoords = 20.0,
+    this.yCoords = 0.0,
+    this.damage = 1,
+    this.damageResistance = 0.1,
+    this.coins = 0,
+    this.speed = 0.2,
+    this.isBetweenTheLimits = false,
+    this.isJumping = false,
+  });
+
+  PlayerState copyWith({
+    double? maxLives,
+    double? xCoords,
+    double? yCoords,
+    double? currentLives,
+    double? damage,
+    double? damageResistance,
+    double? coins,
+    double? speed,
+    PlayerStatus? currentStatus,
+    PlayerStates? currentState,
+    Directions? currentDirection,
+    bool? isBetweenTheLimits,
+    bool? isJumping,
+  }) {
+    return PlayerState(
+      maxLives: maxLives ?? this.maxLives,
+      xCoords: xCoords ?? this.xCoords,
+      yCoords: yCoords ?? this.yCoords,
+      currentLives: currentLives ?? this.currentLives,
+      damage: damage ?? this.damage,
+      damageResistance: damageResistance ?? this.damageResistance,
+      coins: coins ?? this.coins,
+      speed: speed ?? this.speed,
+      currentStatus: currentStatus ?? this.currentStatus,
+      currentState: currentState ?? this.currentState,
+      currentDirection: currentDirection ?? this.currentDirection,
+      isBetweenTheLimits: isBetweenTheLimits ?? this.isBetweenTheLimits,
+      isJumping: isJumping ?? this.isJumping,
+    );
+  }
+}
 
 class PlayerNotifier extends StateNotifier<PlayerState> {
-  PlayerNotifier(this.ref) : super(PlayerState());
+  PlayerNotifier(this.ref)
+      : super(PlayerState(
+            maxLives: 10,
+            currentLives: 10,
+            currentStatus: PlayerStatus.playing));
+
   final Ref ref;
+
   Timer? _jumpTimer;
   Timer? _fallTimer;
-
   Timer? _inactivityTimer;
 
-  // Duración de tiempo para considerar inactividad
   static const inactivityDuration = Duration(seconds: 5);
+  static const leftLimit = 20.0;
+  static const deltaX = 10.0;
 
   void resetData() {
-    state = PlayerState();
+    state = PlayerState(
+        maxLives: 10, currentLives: 10, currentStatus: PlayerStatus.playing);
+    ref.read(doorProvider.notifier).resetData();
+    ref.read(coinProvider.notifier).resetData();
+    ref.read(chestProvider.notifier).resetData();
     ref
-        .read(backgroundProvider.notifier)
-        .resetData(); // Reinicia las posiciones de fondo
-    ref.read(doorProvider.notifier).resetData(); // Reinicia las puertas
-    ref.read(dogProvider.notifier).resetData(); // Reinicia las puertas
-    ref.read(coinProvider.notifier).resetData(); // Reinicia las monedas
-    ref.read(chestProvider.notifier).resetData(); // Reinicia los cofres
-    // ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
+        .read(spiderProvider.notifier)
+        .resetData(state.currentStatus == PlayerStatus.tutorial);
+    ref.read(dogProvider.notifier).resetData();
   }
 
-  void tutorialMode() {
-    state = PlayerState(tutorialMode: true);
-    ref
-        .read(backgroundProvider.notifier)
-        .resetData(); // Reinicia las posiciones de fondo
-    ref.read(doorProvider.notifier).resetData(); // Reinicia las puertas
-    ref.read(dogProvider.notifier).resetData(); // Reinicia las puertas
-    ref.read(coinProvider.notifier).resetData(); // Reinicia las monedas
-    ref.read(chestProvider.notifier).resetData(); // Reinicia los cofres
-    // ref.read(spiderProvider.notifier).resetData(); // Reinicia las arañas
-  }
-
-  void _startInactivityTimer() {
-    _inactivityTimer?.cancel();
+  void startInactivityTimer() {
+    stopInactivityTimer();
     _inactivityTimer = Timer(inactivityDuration, () {
-      dance(); // Llama a dance si pasa el tiempo sin actividad
+      dance();
     });
   }
 
+  void stopInactivityTimer() {
+    _inactivityTimer?.cancel();
+  }
+
   void resetInactivityTimer() {
-    _startInactivityTimer();
+    startInactivityTimer();
+  }
+
+  void updateLives(double newLives) {
+    state = state.copyWith(currentLives: newLives);
+  }
+
+  void updateMaxLives(double newMaxLives) {
+    if (state.maxLives == state.currentLives) {
+      updateLives(newMaxLives);
+    }
+    state = state.copyWith(maxLives: newMaxLives);
+  }
+
+  void updateCoins(double newCoins) {
+    state = state.copyWith(coins: newCoins);
+  }
+
+  void updateSpeed(double newSpeed) {
+    state = state.copyWith(speed: newSpeed);
+  }
+
+  void updateDamage(double newDamage) {
+    state = state.copyWith(damage: newDamage);
+  }
+
+  void updateDamageResistance(double newDamageResistance) {
+    state = state.copyWith(damageResistance: newDamageResistance);
+  }
+
+  void updateCoords(double xCoords, double yCoords) {
+    if (!state.isBetweenTheLimits) return;
+
+    state = state.copyWith(xCoords: xCoords, yCoords: yCoords);
+  }
+
+  void updateStatus(PlayerStatus newStatus) {
+    state = state.copyWith(currentStatus: newStatus);
+  }
+
+  void updateState(PlayerStates newState) {
+    state = state.copyWith(currentState: newState);
+  }
+
+  void updateDirection(Directions newDirection) {
+    state = state.copyWith(currentDirection: newDirection);
+  }
+
+  void updateFlagIsBetweenTheLimits(bool isBetweenTheLimits) {
+    state = state.copyWith(isBetweenTheLimits: isBetweenTheLimits);
+  }
+
+  void updateFlagIsJumping(bool isJumping) {
+    state = state.copyWith(isJumping: isJumping);
+  }
+
+  void tutorialMode() {
+    resetData();
+    updateStatus(PlayerStatus.tutorial);
+  }
+
+  void gameOver() {
+    updateStatus(PlayerStatus.gameOver);
+    AppRouter.go(LobbyRoutes.gameOver.path);
+  }
+
+  void takeDamage(double damage) {
+    if (state.currentStatus == PlayerStatus.tutorial) return;
+    final random = Random();
+    debugPrint(random.toString());
+    if (random.nextDouble() > state.damageResistance) {
+      final newLives = state.currentLives - damage;
+      updateLives(newLives);
+      if (newLives <= 0) {
+        gameOver();
+      }
+    }
+  }
+
+  void addCoins(double coins) {
+    final newCoins = state.coins + coins;
+    updateCoins(newCoins);
+  }
+
+  void attack() {
+    resetInactivityTimer();
+    updateState(PlayerStates.attack);
+    ref.read(spiderProvider.notifier).takeDamage(state.damage);
   }
 
   void jump() {
     resetInactivityTimer();
-    if (!state.isJumping) {
-      state = state.copyWith(
-        isJumping: true,
-        currentState: PlayerStates.jump,
-      );
+    if (state.isJumping) return;
 
-      _jumpTimer?.cancel();
-      _jumpTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-        if (state.positionY <= 25) {
-          state = state.copyWith(
-            positionY: state.positionY + 5,
-          );
-        } else {
-          timer.cancel();
-          _startFalling();
-        }
-      });
-    }
+    state = state.copyWith(
+      isJumping: true,
+      currentState: PlayerStates.jump,
+    );
+
+    _jumpTimer?.cancel();
+    _jumpTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (state.yCoords <= 25) {
+        updateCoords(state.xCoords, state.yCoords + 5);
+      } else {
+        timer.cancel();
+        _startFalling();
+      }
+    });
   }
 
   void _startFalling() {
     resetInactivityTimer();
     _fallTimer?.cancel();
     _fallTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      if (state.positionY >= 5) {
-        state = state.copyWith(
-          positionY: state.positionY - 5,
-        );
+      if (state.yCoords >= 5) {
+        updateCoords(state.xCoords, state.yCoords - 5);
       } else {
         timer.cancel();
-        land();
+        _land();
       }
     });
   }
 
-  void land() {
+  void _land() {
     resetInactivityTimer();
-    // print('endurance: ${state.damageResistance}');
-    // print('damage: ${state.attackDamage}');
-    // print('life: ${state.maxHealth}');
-    // print('speed: ${state.playerSpeed}');
     state = state.copyWith(
       isJumping: false,
       currentState: PlayerStates.stay,
@@ -113,106 +253,62 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void dance() {
-    state = state.copyWith(
-      currentState: PlayerStates.dance,
-    );
+    updateState(PlayerStates.dance);
   }
 
-  // Definimos los límites del jugador en la pantalla
-  static const double leftBoundary = 20.0;
-
-  void moveRight(double rightLimit) {
-    print(state.positionX);
+  void move() {
     resetInactivityTimer();
+    ref.read(dogProvider.notifier).followPlayer(state.xCoords);
+    updateState(PlayerStates.walk);
+  }
 
-    final rightBoundary = state.tutorialMode ? rightLimit : rightLimit / 1.5;
-    final distanciaRecorrida = state.moveAmount * state.playerSpeed;
-
-    // // Verificar si se puede mover a la derecha
-    // if (!ref
-    //     .read(backgroundProvider.notifier)
-    //     .canMoveRight(distanciaRecorrida)) {
-    //   return; // Si no se puede mover, salimos de la función
-    // }
-
-    if (state.positionX < rightBoundary) {
-      // Si no ha llegado al límite derecho, movemos al jugador
-      state = state.copyWith(
-        positionX: state.positionX + distanciaRecorrida,
-        currentDirection: Directions.right,
-        currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
-      );
-    } else {
-      // Si está en el límite derecho, movemos el fondo
-      state = state.copyWith(
-        skyPosition:
-            state.skyPosition - (!state.tutorialMode ? distanciaRecorrida : 0),
-        groundPosition: state.groundPosition -
-            (!state.tutorialMode ? distanciaRecorrida : 0),
-        currentDirection: Directions.right,
-        currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
-      );
-      if (!state.tutorialMode) {
-        ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
-        ref.read(coinProvider.notifier).updateXCoords(-distanciaRecorrida);
-        ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
-        ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
-      }
-    }
-    if (!state.tutorialMode) {
-      ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
-    }
-    checkCollisionsDoors();
-    checkCollisionsCoins();
-    checkCollisionsChests();
-    checkCollisionsSpiders();
+  void stopMovement() {
+    resetInactivityTimer();
+    updateState(PlayerStates.stay);
   }
 
   void moveLeft() {
-    resetInactivityTimer();
-    final distanciaRecorrida = -state.moveAmount * state.playerSpeed;
+    final distance = -deltaX * state.speed;
 
-    // // Verificar si se puede mover a la izquierda
-    // if (!ref
-    //     .read(backgroundProvider.notifier)
-    //     .canMoveLeft(distanciaRecorrida)) {
-    //   return; // Si no se puede mover, salimos de la función
-    // }
+    state.xCoords > leftLimit
+        ? updateFlagIsBetweenTheLimits(true)
+        : updateFlagIsBetweenTheLimits(false);
 
-    if (state.positionX > leftBoundary) {
-      // Si no ha llegado al límite izquierdo, movemos al jugador
-      state = state.copyWith(
-        positionX: state.positionX + distanciaRecorrida,
-        currentDirection: Directions.left,
-        currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
-      );
-    } else {
-      // Si está en el límite izquierdo, movemos el fondo
-      state = state.copyWith(
-        skyPosition: state.skyPosition - distanciaRecorrida,
-        groundPosition: state.groundPosition - distanciaRecorrida,
-        currentDirection: Directions.left,
-        currentState: !state.isJumping ? PlayerStates.walk : state.currentState,
-      );
-      ref.read(doorProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(coinProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(chestProvider.notifier).updateXCoords(-distanciaRecorrida);
-      ref.read(spiderProvider.notifier).updateXCoords(-distanciaRecorrida);
-    }
-    ref.read(backgroundProvider.notifier).updateXCoords(distanciaRecorrida);
-    checkCollisionsDoors();
-    checkCollisionsCoins();
-    checkCollisionsChests();
-    checkCollisionsSpiders();
+    final newPosition = state.xCoords + distance;
+
+    updateDirection(Directions.left);
+    updateCoordsOfEnviromentsEntities(distance);
+    checkCollisions();
+    updateCoords(newPosition, state.yCoords);
+    move();
   }
 
-  void stopMoving() {
-    resetInactivityTimer();
-    if (!state.isJumping) {
-      state = state.copyWith(
-        currentState: PlayerStates.stay,
-      );
-    }
+  void moveRight(double rightLimit) {
+    final distance = deltaX * state.speed;
+
+    state.xCoords < rightLimit
+        ? updateFlagIsBetweenTheLimits(true)
+        : updateFlagIsBetweenTheLimits(false);
+
+    final newPosition = state.xCoords + distance;
+
+    updateCoords(newPosition, state.yCoords);
+    updateCoordsOfEnviromentsEntities(distance);
+    checkCollisions();
+    updateDirection(Directions.right);
+    move();
+  }
+
+  void updateCoordsOfEnviromentsEntities(double distance) {
+    if (state.currentStatus == PlayerStatus.tutorial) return;
+    ref.read(doorProvider.notifier).updateXCoords(distance);
+    ref.read(coinProvider.notifier).updateXCoords(distance);
+    ref.read(chestProvider.notifier).updateXCoords(distance);
+    ref.read(spiderProvider.notifier).updateXCoords(distance);
+    ref.read(backgroundProvider.notifier).updateXCoords(distance);
+  }
+
+  void checkCollisions() {
     checkCollisionsDoors();
     checkCollisionsCoins();
     checkCollisionsChests();
@@ -220,170 +316,40 @@ class PlayerNotifier extends StateNotifier<PlayerState> {
   }
 
   void checkCollisionsDoors() {
-    ref.read(doorProvider.notifier).isAnyDoorNear(state.positionX);
+    ref.read(doorProvider.notifier).isAnyDoorNear(state.xCoords);
   }
 
   void checkCollisionsCoins() {
-    ref.read(coinProvider.notifier).isAnyCoinNear(state.positionX);
+    ref.read(coinProvider.notifier).isAnyCoinNear(state.xCoords);
   }
 
   void checkCollisionsChests() {
-    ref.read(chestProvider.notifier).isAnyChestNear(state.positionX);
+    ref.read(chestProvider.notifier).isAnyChestNear(state.xCoords);
   }
 
   void checkCollisionsSpiders() {
-    // ref.read(spiderProvider.notifier).isAnySpiderNear(state.positionX);
-    final spidersIndex = ref.read(spiderProvider);
+    ref.read(spiderProvider.notifier).isAnySpiderNear(state.xCoords);
 
-    if (spidersIndex.spiders
-        .where(
-          (spider) {
-            return spider.currentState == SpiderStates.walk ||
-                spider.currentState == SpiderStates.attack;
-          },
-        )
-        .toList()
-        .isNotEmpty) {
-      // ref.read(spiderProvider.notifier).changeState(SpiderStates.attack);
-      state = state.copyWith(
-        moveAmount: 0,
-        playerSpeed: 0,
-      );
-      // ref.read(dogProvider.notifier).help();
-    } else {
-      state = state.copyWith(
-        moveAmount: 10,
-        playerSpeed: 0.2,
-      );
-    }
+    final spiders = ref.read(spiderProvider).spiders;
+    final isSpiderNear = spiders.any((spider) =>
+        spider.currentState == SpiderStates.walk ||
+        spider.currentState == SpiderStates.attack);
+
+    _updatePlayerSpeed(isSpiderNear);
+    _updateDogBehavior(isSpiderNear);
   }
 
-  void changeState(PlayerStates newState) {
-    state = state.copyWith(
-      currentState: newState,
-    );
+  void _updatePlayerSpeed(bool isSpiderNear) {
+    final double newSpeed = isSpiderNear ? 0 : 0.2;
+    state = state.copyWith(speed: newSpeed);
   }
 
-  void increaseEndurance(double endurancePercentage) {
-    state = state.copyWith(damageResistance: endurancePercentage);
-  }
-
-  void increaseDamage(double newDamage) {
-    state = state.copyWith(attackDamage: newDamage);
-  }
-
-  void increaseMaxLife(double newHealth) {
-    state = state.copyWith(
-      maxHealth: newHealth,
-      health: state.health == state.maxHealth ? newHealth : 0,
-    );
-  }
-
-  void increaseSpeed(double newSpeed) {
-    state = state.copyWith(playerSpeed: newSpeed);
-  }
-
-  void takeDamage(double damage) {
-    // Calculate actual damage based on damage resistance
-    final actualDamage = damage * (1 - (state.damageResistance / 100));
-
-    final newHealth = state.health - actualDamage;
-
-    if (newHealth <= 0) {
-      AppRouter.go(LobbyRoutes.gameOver.path);
-    }
-
-    state = state.copyWith(
-      health: newHealth,
-    );
-  }
-
-  void getCoin(double amount) {
-    state = state.copyWith(
-      coins: state.coins + amount,
-    );
-  }
-
-  void attack() {
-    resetInactivityTimer();
-    state = state.copyWith(
-      currentState: PlayerStates.attack,
-    );
-
-    ref.read(spiderProvider.notifier).takeDamage(state.attackDamage);
-
-    ref.read(dogProvider.notifier).changeState(ShadowStates.bark);
+  void _updateDogBehavior(bool isSpiderNear) {
+    ref.read(dogProvider.notifier).goAwayFromEnemy(state.xCoords, isSpiderNear);
   }
 }
 
-class PlayerState {
-  final double skyPosition;
-  final double groundPosition;
-  final double positionX;
-  final double positionY;
-  final bool isJumping;
-  final Directions currentDirection;
-  final PlayerStates currentState;
-  final double moveAmount;
-  final double playerSpeed;
-  final double health;
-  final double coins;
-  final double maxHealth;
-  final double attackDamage;
-  final double damageResistance;
-  final bool tutorialMode;
-
-  PlayerState({
-    this.skyPosition = 0,
-    this.groundPosition = 0,
-    this.positionX = 20,
-    this.positionY = 0,
-    this.isJumping = false,
-    this.currentDirection = Directions.right,
-    this.currentState = PlayerStates.stay,
-    this.moveAmount = 10,
-    this.playerSpeed = 0.2,
-    this.health = 10,
-    this.coins = 0,
-    this.maxHealth = 10,
-    this.attackDamage = 2,
-    this.damageResistance = 0,
-    this.tutorialMode = false,
-  });
-
-  PlayerState copyWith({
-    double? skyPosition,
-    double? groundPosition,
-    double? positionX,
-    double? positionY,
-    bool? isJumping,
-    Directions? currentDirection,
-    PlayerStates? currentState,
-    double? moveAmount,
-    double? playerSpeed,
-    double? health,
-    double? coins,
-    double? maxHealth,
-    double? attackDamage,
-    double? damageResistance,
-    bool? tutorialMode,
-  }) {
-    return PlayerState(
-      skyPosition: skyPosition ?? this.skyPosition,
-      groundPosition: groundPosition ?? this.groundPosition,
-      positionX: positionX ?? this.positionX,
-      positionY: positionY ?? this.positionY,
-      isJumping: isJumping ?? this.isJumping,
-      currentDirection: currentDirection ?? this.currentDirection,
-      currentState: currentState ?? this.currentState,
-      moveAmount: moveAmount ?? this.moveAmount,
-      playerSpeed: playerSpeed ?? this.playerSpeed,
-      health: health ?? this.health,
-      coins: coins ?? this.coins,
-      maxHealth: maxHealth ?? this.maxHealth,
-      attackDamage: attackDamage ?? this.attackDamage,
-      damageResistance: damageResistance ?? this.damageResistance,
-      tutorialMode: tutorialMode ?? this.tutorialMode,
-    );
-  }
-}
+final playerProvider =
+    StateNotifierProvider<PlayerNotifier, PlayerState>((ref) {
+  return PlayerNotifier(ref);
+});
