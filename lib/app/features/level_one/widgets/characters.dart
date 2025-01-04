@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/dog_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
-import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
+// import 'package:shadow_game_v2/app/features/level_one/providers/shadow_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/spider_provider.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/custom_gif.dart';
 import 'package:shadow_game_v2/app/features/level_one/widgets/spider_widget.dart';
@@ -51,21 +52,21 @@ class CharactersState extends ConsumerState<Characters> {
         // Perro
         Positioned(
           bottom: groundHeight,
-          left: dogState.positionX,
+          left: dogState.xCoords,
           child: GestureDetector(
             onLongPressDown: (_) {
               setState(() {
-                ref.read(dogProvider.notifier).changeState(ShadowStates.bark);
+                ref.read(dogProvider.notifier).updateState(ShadowStates.bark);
               });
             },
             onLongPressEnd: (_) {
               setState(() {
-                ref.read(dogProvider.notifier).changeState(ShadowStates.sit);
+                ref.read(dogProvider.notifier).updateState(ShadowStates.sit);
               });
             },
             onTapUp: (_) {
               setState(() {
-                ref.read(dogProvider.notifier).changeState(ShadowStates.sit);
+                ref.read(dogProvider.notifier).updateState(ShadowStates.sit);
               });
             },
             child: CustomGif(
@@ -78,8 +79,8 @@ class CharactersState extends ConsumerState<Characters> {
         ),
         // Jugador
         Positioned(
-          bottom: groundHeight + playerState.positionY,
-          left: playerState.positionX,
+          bottom: groundHeight + playerState.yCoords,
+          left: playerState.xCoords,
           child: GestureDetector(
             onLongPressDown: (_) {
               setState(() {});

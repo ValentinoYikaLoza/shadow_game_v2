@@ -1,12 +1,34 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
-// import 'package:shadow_game_v2/app/features/level_one/providers/player_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 
-final dogProvider = StateNotifierProvider<DogNotifier, DogState>((ref) {
-  return DogNotifier(ref);
-});
+class DogState {
+  final double xCoords;
+  final ShadowStates currentState;
+  final Directions currentDirection;
+  final bool isEnemyNear;
+
+  DogState({
+    this.xCoords = 45,
+    this.isEnemyNear = false,
+    this.currentState = ShadowStates.sit,
+    this.currentDirection = Directions.left,
+  });
+
+  DogState copyWith({
+    double? xCoords,
+    ShadowStates? currentState,
+    Directions? currentDirection,
+    bool? isEnemyNear,
+  }) {
+    return DogState(
+      xCoords: xCoords ?? this.xCoords,
+      currentState: currentState ?? this.currentState,
+      currentDirection: currentDirection ?? this.currentDirection,
+      isEnemyNear: isEnemyNear ?? this.isEnemyNear,
+    );
+  }
+}
 
 class DogNotifier extends StateNotifier<DogState> {
   DogNotifier(this.ref) : super(DogState()) {
@@ -15,6 +37,7 @@ class DogNotifier extends StateNotifier<DogState> {
       followPlayer(previous, next);
     });
   }
+  //! Refactorizar el código para que sea más legible
   final Ref ref;
   double? previousPositionX;
 
@@ -29,8 +52,8 @@ class DogNotifier extends StateNotifier<DogState> {
 
     // Verifica si la posición X del jugador ha cambiado
     bool hasPositionChanged =
-        previousPositionX != null && previousPositionX != playerState.positionX;
-    previousPositionX = playerState.positionX;
+        previousPositionX != null && previousPositionX != playerState.xCoords;
+    previousPositionX = playerState.xCoords;
 
     // Si estaba caminando y ahora salta, mantiene la caminata
     if (!hasPositionChanged &&
@@ -41,17 +64,17 @@ class DogNotifier extends StateNotifier<DogState> {
     }
 
     // Actualizar la posición y dirección del perro para que siga al jugador
-    if (playerState.positionX < state.positionX - followDistance) {
+    if (playerState.xCoords < state.xCoords - followDistance) {
       // Si el jugador está a la izquierda y el perro está demasiado lejos
       state = state.copyWith(
-        positionX: playerState.positionX + followDistance,
+        xCoords: playerState.xCoords + followDistance,
         currentState: ShadowStates.walk,
         currentDirection: Directions.left,
       );
-    } else if (playerState.positionX > state.positionX + followDistance) {
+    } else if (playerState.xCoords > state.xCoords + followDistance) {
       // Si el jugador está a la derecha y el perro está demasiado lejos
       state = state.copyWith(
-        positionX: playerState.positionX - followDistance,
+        xCoords: playerState.xCoords - followDistance,
         currentState: ShadowStates.walk,
         currentDirection: Directions.right,
       );
@@ -59,7 +82,7 @@ class DogNotifier extends StateNotifier<DogState> {
       // si el jugador está quieto
       state = state.copyWith(
         currentState: state.isEnemyNear ? ShadowStates.bark : ShadowStates.sit,
-        currentDirection: playerState.positionX < state.positionX
+        currentDirection: playerState.xCoords < state.xCoords
             ? Directions.left
             : Directions.right,
       );
@@ -80,30 +103,6 @@ class DogNotifier extends StateNotifier<DogState> {
   }
 }
 
-class DogState {
-  final double positionX;
-  final ShadowStates currentState;
-  final Directions currentDirection;
-  final bool isEnemyNear;
-
-  DogState({
-    this.positionX = 45,
-    this.isEnemyNear = false,
-    this.currentState = ShadowStates.sit,
-    this.currentDirection = Directions.left,
-  });
-
-  DogState copyWith({
-    double? positionX,
-    ShadowStates? currentState,
-    Directions? currentDirection,
-    bool? isEnemyNear,
-  }) {
-    return DogState(
-      positionX: positionX ?? this.positionX,
-      currentState: currentState ?? this.currentState,
-      currentDirection: currentDirection ?? this.currentDirection,
-      isEnemyNear: isEnemyNear ?? this.isEnemyNear,
-    );
-  }
-}
+final dogProvider = StateNotifierProvider<DogNotifier, DogState>((ref) {
+  return DogNotifier(ref);
+});

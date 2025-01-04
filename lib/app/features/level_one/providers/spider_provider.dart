@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadow_game_v2/app/features/level_one/models/data.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/background_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/chest_provider.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/dog_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/door_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 import 'package:shadow_game_v2/app/features/shared/widgets/snackbar.dart';
@@ -116,7 +117,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
 
   bool canMove() {
     final playerState = ref.read(playerProvider);
-    return playerState.isMoving;
+    return playerState.isBetweenTheLimits;
   }
 
   bool canMoveLeft(double distance) {
@@ -150,7 +151,7 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
       state = state.copyWith(
         spiders: state.spiders.map((spider) {
           if (spider.currentState == SpiderStates.walk) {
-            return _moveSpiderTowardsPlayer(spider, playerState.positionX);
+            return _moveSpiderTowardsPlayer(spider, playerState.xCoords);
           }
           return spider;
         }).toList(),
@@ -226,6 +227,9 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
             xCoords: spider.xCoords + 150,
             doorType: DoorType.finish,
           );
+
+      final playerX = ref.read(playerProvider).xCoords;
+      ref.read(dogProvider.notifier).goBackToThePlayer(playerX);
       SnackbarService.show('¡Felicidades haz completado el primer nivel!',
           type: SnackbarType.animated);
     });
@@ -237,10 +241,11 @@ class SpiderNotifier extends StateNotifier<SpiderState> {
   void _handleNonLastSpiderDeath(Spider spider) {
     Future.delayed(const Duration(seconds: 2), () {
       ref.read(chestProvider.notifier).addChest(xCoords: spider.xCoords + 50);
-
+      final playerX = ref.read(playerProvider).xCoords;
+      ref.read(dogProvider.notifier).goBackToThePlayer(playerX);
       final random = Random();
-      final randomDistance =
-          random.nextDouble() * 900 + 300; // Random distance between 50 and 150
+      final randomDistance = random.nextDouble() * 1500 +
+          900; // Random distance between 900 and 1500
       addSpider(
         xCoords: spider.xCoords + randomDistance,
       );

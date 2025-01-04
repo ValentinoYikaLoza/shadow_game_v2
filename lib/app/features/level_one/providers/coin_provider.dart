@@ -84,7 +84,7 @@ class CoinNotifier extends StateNotifier<CoinState> {
 
   bool canMove() {
     final playerState = ref.read(playerProvider);
-    return playerState.isMoving;
+    return playerState.isBetweenTheLimits;
   }
 
   bool canMoveLeft(double distance) {

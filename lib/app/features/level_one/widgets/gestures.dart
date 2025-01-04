@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadow_game_v2/app/features/level_one/providers/dog_provider.dart';
 import 'package:shadow_game_v2/app/features/level_one/providers/player_provider_2.dart';
 
 class Gestures extends ConsumerStatefulWidget {
@@ -36,10 +37,14 @@ class GesturesState extends ConsumerState<Gestures> {
                     playerNotifier.moveLeft();
                   });
                 },
+                onVerticalDragStart: (_){
+                  playerNotifier.jump();
+                },
                 // onLongPressMoveUpdate: (_) => playerNotifier.moveLeft(),
                 onLongPressEnd: (_) {
                   _leftTimer?.cancel();
                   playerNotifier.stopMovement();
+                  ref.read(dogProvider.notifier).stopMovement(); 
                 },
                 child: Container(color: Colors.transparent),
               ),
@@ -55,10 +60,14 @@ class GesturesState extends ConsumerState<Gestures> {
                             : screenWidth / 1.5);
                   });
                 },
+                onVerticalDragStart: (_){
+                  playerNotifier.jump();
+                },
                 // onLongPressMoveUpdate: (_) => playerNotifier.moveRight(screenWidth / 1.5),
                 onLongPressEnd: (_) {
                   _rightTimer?.cancel();
                   playerNotifier.stopMovement();
+                  ref.read(dogProvider.notifier).stopMovement(); 
                 },
                 child: Container(color: Colors.transparent),
               ),
